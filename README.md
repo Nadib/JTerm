@@ -7,6 +7,7 @@ Features list:
  * Browse commands history with keyboard arrows (top and bottom).
  * Text selection behaviors with keyboard arrows (left and rigth).
  * Basic simple design fully customizable with CSS.
+ * No dependencies needed.
  
 Example :
 
@@ -17,6 +18,6 @@ Simple javascript example :
 ```javascript
 shell = new ShellUI('input-element','shell-output-container','input-endline-element', 'input-prefix-element');
 shell.addCommand('hello', function(name){
-	return 'You Say hello to '+name;
+	return 'You said hello to '+name;
 });
 ```
