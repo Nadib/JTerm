@@ -33,6 +33,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * Initialize the shellUI after dom ready event.
 	 */
 	this.init = function() {
+		
 		this.inputElement = document.getElementById(this.inputElement);
 		if(this.endlineElement){
 			this.endlineElement = document.getElementById(this.endlineElement);
@@ -43,7 +44,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		if(this.prefixElement){
 			this.prefixElement = document.getElementById(this.prefixElement);
 		}
-		document.addEventListener('keypress', this.setInputContent.bind(this));
+		document.addEventListener('keypress', this.keyboardCallback.bind(this));
 		document.addEventListener('keydown', this.keyboardInteraction.bind(this));
 	};
 	
@@ -109,7 +110,9 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * 
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
-	this.setInputContent = function(e){
+	this.keyboardCallback = function(e){
+		console.log(e);
+		// Safari not support KeyboarEvent.key property at this time
 		if(e.key){
 			if(e.key != 'Enter'){
 				if(this.keyboardSelected !== null){						
@@ -130,22 +133,21 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 				}
 				if(command){
 					this.commandHistory.push(command);
-					
 					this.executeCommand(command);
-					// carManager[name].apply( carManager, [].slice.call(arguments, 1)
-					
-					// Exec Command
 				}
 				this.resetInput();				
 			}
 		}
 	};
 	
+	/**
+	 * Print to output container.
+	 * 
+	 * @param {string} text - The text to print in the output container
+	 */
 	this.printOutput = function(text){
 		this.outputElement.appendChild(this.createElement('p',text));
 	};
-	
-	
 	
 	/**
 	 * Remove a char form the shell input box.
@@ -259,7 +261,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 				}else{
 					this.removeChar(-1);
 				}
-        		break;
+        		break;        	
         	case 37:
         		this.selectFromKeyboard('left');
         		break;
@@ -275,6 +277,11 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		    default:
 		}
 	};
-	// Init the shell UI when Dom will be ready.
-	document.addEventListener("DOMContentLoaded", this.init.bind(this));
+	
+	// Init the shell UI when Dom is ready.
+	if( document.readyState === 'complete' ) {
+		this.init();
+	}else{
+		document.addEventListener("DOMContentLoaded", this.init.bind(this));
+	}
 };

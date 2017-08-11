@@ -3,14 +3,16 @@ A javascript shell UI like the Mac os X terminal
 
 Features list:
 
- * Add custom commands.
- * Command history management.
-
+ * Add commands as javascript function callback.
+ * Browse commands history with keyboard arrows (top and bottom).
+ * Text selection behaviors with keyboard arrows (left and rigth).
+ * Basic simple design fully customizable with CSS.
+ 
 Example :
 
-Take a look at [index.html](https://github.com/Nadib/Javascript-Shell-UI/blob/master/index.html) for an implemetation example.
+Take a look at [index.html](https://github.com/Nadib/Javascript-Shell-UI/blob/master/index.html) for a basic integration example.
 
-Usage :
+Simple javascript example :
  
 ```javascript
 shell = new ShellUI('input-element','shell-output-container','input-endline-element', 'input-prefix-element');
