@@ -35,6 +35,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	this.init = function() {
 		
 		this.inputElement = document.getElementById(this.inputElement);
+		this.inputElement.style = 'white-space:pre;';
 		if(this.endlineElement){
 			this.endlineElement = document.getElementById(this.endlineElement);
 		}
@@ -111,7 +112,6 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
 	this.keyboardCallback = function(e){
-		console.log(e);
 		// Safari not support KeyboarEvent.key property at this time
 		if(e.key){
 			if(e.key != 'Enter'){
