@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Titre de la page</title>
+  <link rel="stylesheet" href="ShellUI.css">
+  <script src="ShellUI.js"></script>
+  <script>
+  	shell = new ShellUI('input-element','shell-output-container','input-endline-element', 'input-prefix-element');
+  	shell.addCommand('hello', function(name){
+  		return 'You Say hello to '+name;
+  	});
+  </script>
+</head>
+<body>
+	<div id="shell-output-container">
+		<p>Welcome to Javascript ShellUI</p>
+	</div>	
+	 <div>
+	 	<span id="input-prefix-element">$ </span><span id="input-element"></span><span id="input-endline-element" class="shellui-highlight"> &nbsp; </span>
+	 </div>
+</body>
+</html>
+
+
+
+
+
+
