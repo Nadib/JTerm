@@ -28,7 +28,11 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	this.commandHistory=[];
 	/** @member {object} */
 	this.commands={};
-	this.commandBound=null;
+	/** @member {boolean} */
+	this.preventPaste=false;
+	/** @member {boolean} */
+	this.controlPressed=false;
+	
 	/**
 	 * Initialize the shellUI after dom ready event.
 	 */
@@ -188,6 +192,13 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 					e.key = decodedChar;
 		    	}		    	
 		    	if(this.preventPaste === false){
+		    		if(this.controlPressed === true && e.keyCode === 3){
+		    			// 3
+		    			this.resetInput();
+		    			this.controlPressed === false;
+		    			return;
+		    		}
+		    		
 		    		if(this.keyboardSelected !== null){						
 						this.inputElement.insertBefore(this.createElement('span',e.key), this.inputElement.children[this.keyboardSelected]);
 						this.selectChar(this.keyboardSelected+1);					  
@@ -319,6 +330,11 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 			this.preventPaste = true;
 			return;
 		}
+		if(e.keyIdentifier == 'Control' || e.key === 'Control'){
+			this.controlPressed = true;
+			return;
+		}
+		
 		switch (e.keyCode) {
     		case 8:
         		if(this.keyboardSelected !== null){
