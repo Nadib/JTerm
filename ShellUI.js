@@ -28,12 +28,11 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	this.commandHistory=[];
 	/** @member {object} */
 	this.commands={};
-	
+	this.commandBound=null;
 	/**
 	 * Initialize the shellUI after dom ready event.
 	 */
 	this.init = function() {
-		
 		this.inputElement = document.getElementById(this.inputElement);
 		this.inputElement.style = 'white-space:pre;';
 		if(this.endlineElement){
@@ -41,12 +40,14 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		}
 		if(this.outputElement){
 			this.outputElement = document.getElementById(this.outputElement);
+			this.outputElement.style = 'white-space:pre;';
 		}
 		if(this.prefixElement){
 			this.prefixElement = document.getElementById(this.prefixElement);
 		}
 		document.addEventListener('keypress', this.keyboardCallback.bind(this));
 		document.addEventListener('keydown', this.keyboardInteraction.bind(this));
+		document.addEventListener('commandComplete', this.commandComplete.bind(this));
 	};
 	
 	/**
@@ -55,8 +56,8 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * @param {string} name - The command name.
 	 * @param {function} callback - The callback funcion for the command.
 	 */
-	this.addCommand = function(name, callback){
-		this.commands[name] = callback;
+	this.addCommand = function(name, callback, options){
+		this.commands[name] = new ShellUICommand(name, callback, options);
 	};
 	
 	/**
@@ -72,14 +73,26 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		if(!this.commands[commandName]){
 		 	this.printOutput('-ShellUI: '+commandName+': command not found');
 		}else{
-			var returnValue = this.commands[commandName].apply(commandName, arguments);
-			if(returnValue){
-				this.printOutput(returnValue);
-				return returnValue;
-			}
-			
+			if(this.prefixElement){
+				this.prefixElement.style = 'display:none';
+			}			
+			this.commands[commandName].execute(arguments);
 		}
-		return null;
+	};
+	
+	/**
+	 * Command complete callback.
+	 * 
+	 * @param {CustomEvent} e - Custom commandComplete event.
+	 */
+	this.commandComplete = function(e){
+		if(e.detail && e.detail.returnContent){
+			this.printOutput(e.detail.returnContent);
+		}
+		this.resetInput();
+		if(this.prefixElement){
+			this.prefixElement.style = 'display:auto';
+		}
 	};
 	
 	/**
@@ -115,6 +128,8 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		// Safari not support KeyboarEvent.key property at this time
 		if(e.key){
 			if(e.key != 'Enter'){
+				// Manage option+v for paste
+				// Manage CTRL+c to cancel the current command
 				if(this.keyboardSelected !== null){						
 					this.inputElement.insertBefore(this.createElement('span',e.key), this.inputElement.children[this.keyboardSelected]);
 					this.selectChar(this.keyboardSelected+1);					  
@@ -130,12 +145,13 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 					}
 					displayText += command;
 					this.printOutput(displayText);
+					this.resetInput();
 				}
 				if(command){
 					this.commandHistory.push(command);
 					this.executeCommand(command);
 				}
-				this.resetInput();				
+								
 			}
 		}
 	};
@@ -284,4 +300,47 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	}else{
 		document.addEventListener("DOMContentLoaded", this.init.bind(this));
 	}
+};
+
+/**
+ * Shell UI command.
+ * @constructor
+ * @classdesc Shell UI command.
+ * @param {string} name - Command name.
+ * @param {function} callback - The function to call.
+ * @param {object} options - Options object.
+ * 
+ * List of available options :
+ * 	async {boolean} true if the command is asynchronous.
+ * 
+ * @license Apache-2.0
+ * @author Nadib Bandi
+ */
+var ShellUICommand = function(name, callback, options) {
+	/** @member {string} */
+	this.name = name;
+	/** @member {function} */
+	this.callback = callback;
+	/** @member {object} */
+	this.options = options;
+	if(this.options === undefined){
+		this.options = {};
+	}
+	
+	/**
+	 * Execute the command
+	 * 
+	 * @param {array} arguments - List of arguments.
+	 * 
+	 * @return mixed
+	 */
+	this.execute = function(arguments){		
+		// Wait for the async
+		if(this.options.async === true){
+			this.callback.apply(this, arguments);
+		}else{
+			var event = new CustomEvent('commandComplete', {detail:{returnContent:this.callback.apply(this, arguments)}});
+			document.dispatchEvent(event);
+		}
+	};
 };

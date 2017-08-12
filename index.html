@@ -7,15 +7,22 @@
   <script src="ShellUI.js"></script>
   <script type="text/javascript">
   	shell = new ShellUI('input-element','shell-output-container','input-endline-element', 'input-prefix-element');
+  	// Add normal command
   	shell.addCommand('hello', function(name){
   		return 'You said hello to '+name;
   	});
+  	// Add Async command
+  	shell.addCommand('asyncHello', function(name){
+  		setTimeout(function(){
+  			var event = new CustomEvent('commandComplete', {detail:{returnContent:'You said hello asynchronously to '+name}});
+			document.dispatchEvent(event);	
+  		}, 3000);
+  	}, {async:true});
   </script>
 </head>
 <body>
-	<div id="shell-output-container">
-		<p>Welcome to Javascript ShellUI</p>
-	</div>
+	<p>Welcome to Javascript ShellUI</p>
+	<div id="shell-output-container"></div>
 	 <div>
 	 	<span id="input-prefix-element">$ </span><span id="input-element"></span><span id="input-endline-element" class="shellui-highlight">&nbsp;</span>
 	 </div>
