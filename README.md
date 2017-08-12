@@ -24,6 +24,11 @@ Available options :
 
  * prefix {string} Prefix for the shell input line, default '$'.
  * highlightColor {string} Highlight color, default value '#a5a5a5'.
+ 
+ Supported events :
+ 
+ * 'commandComplete' Fired when a command is completed.
+ * 'cancel' Fired when a command was cancelled
 
 Simple javascript example :
 
@@ -38,9 +43,7 @@ shell.addCommand('hello', function(name){
 // Add Async command
 shell.addCommand('asyncHello', function(name){
 	setTimeout(function(){
-		// Async command require event dispatch.
-  		var event = new CustomEvent('commandComplete', {detail:{returnContent:'You said hello asynchronously to '+name}});
-		document.dispatchEvent(event);	
-  	}, 3000);
+  		this.endCommand('You said hello asynchronously to '+name);		
+  	}.bind(this), 3000);
 }, {async:true});
 ```
