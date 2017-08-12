@@ -4,22 +4,37 @@
  * @classdesc Shell UI class.
  * @param {string} inputElement - The dom id of the input element generally a span.
  * @param {string} outputElement - The dom id of the shell output element generally a div.
- * @param {string} endlineElement - The dom id of the input end line element generaly a span.
- * @param {string} prefixElement - The dom id of the input prefix element generaly a span.
+ * @param {object} options - Options object.
+ * 
+ * Available options :
+ * 	- prefix {string} Prefix for the shell input, default value '$'.
+ *  - highlightColor {string} Highlight color, default value '#a5a5a5',
  * 
  * @license Apache-2.0
  * @author Nadib Bandi
  */
-var ShellUI = function(inputElement, outputElement, endlineElement, prefixElement) {
+var ShellUI = function(inputElement, outputElement, options) {
+	
+	if(options === undefined){
+		options = {};
+	}
+	if(options.prefix === undefined){
+		options.prefix = '$';
+	}
+	if(options.highlightColor === undefined){
+		options.highlightColor = '#a5a5a5';
+	}
+	
+	this.options = options;
 	
 	/** @member {Element} */
 	this.inputElement = inputElement;
 	/** @member {Element} */
 	this.outputElement = outputElement;
 	/** @member {Element} */
-	this.endlineElement = endlineElement;
+	this.endlineElement = null;
 	/** @member {Element} */
-	this.prefixElement = prefixElement;
+	this.prefixElement = null;
 	/** @member {Number} */
 	this.keyboardSelected=null;
 	/** @member {Number} */
@@ -39,17 +54,23 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	this.init = function() {
 		this.inputElement = document.getElementById(this.inputElement);
 		this.inputElement.style['white-space'] = 'pre';
-		document.addEventListener("paste", this.pasteText.bind(this));		
-		if(this.endlineElement){
-			this.endlineElement = document.getElementById(this.endlineElement);
-		}
-		if(this.outputElement){
-			this.outputElement = document.getElementById(this.outputElement);
-			this.outputElement.style['white-space'] = 'pre';
-		}
-		if(this.prefixElement){
-			this.prefixElement = document.getElementById(this.prefixElement);
-		}
+		document.addEventListener("paste", this.pasteText.bind(this));	
+		
+		this.outputElement = document.getElementById(this.outputElement);
+		this.outputElement.style['white-space'] = 'pre';
+		
+		
+		this.endlineElement = this.createElement('span', ' ');
+		this.endlineElement.style['background-color'] = this.options.highlightColor;
+		this.endlineElement.style['white-space'] = 'pre';
+
+		this.inputElement.parentElement.insertBefore(this.endlineElement, this.inputElement.nextSibling);
+		
+		
+		this.prefixElement = this.createElement('span', this.options.prefix+' ');
+		this.inputElement.parentElement.insertBefore(this.prefixElement, this.inputElement);
+		
+		
 		document.addEventListener('keypress', this.keyboardCallback.bind(this));
 		document.addEventListener('keydown', this.keyboardInteraction.bind(this));
 		document.addEventListener('commandComplete', this.commandComplete.bind(this));
@@ -103,9 +124,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		if(!this.commands[commandName]){
 		 	this.printOutput('-ShellUI: '+commandName+': command not found');
 		}else{
-			if(this.prefixElement){
-				this.prefixElement.style.display = 'none';
-			}			
+			this.prefixElement.style.display = 'none';
 			this.commands[commandName].execute(arguments);
 		}
 	};
@@ -120,9 +139,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 			this.printOutput(e.detail.returnContent);
 		}
 		this.resetInput();
-		if(this.prefixElement){
-			this.prefixElement.style.display = 'inline';
-		}
+		this.prefixElement.style.display = 'inline';
 	};
 	
 	/**
@@ -169,15 +186,8 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
         		break;
         	case 13:
         		var command = this.inputElement.textContent;
-				if(this.outputElement){
-					var displayText = ''; 
-					if(this.prefixElement){
-						displayText += this.prefixElement.textContent;
-					}
-					displayText += command;
-					this.printOutput(displayText);
-					this.resetInput();
-				}
+				this.printOutput(this.prefixElement.textContent+command);
+				this.resetInput();
 				if(command){
 					this.commandHistory.push(command);
 					this.executeCommand(command);
