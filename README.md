@@ -7,6 +7,7 @@ Features list:
  * Browse commands history with keyboard arrows (top and bottom).
  * Text selection behaviors with keyboard arrows (left and rigth).
  * Paste from clipboard.
+ * Events implementation.
  * Basic design fully customizable with CSS.
  * No dependencies (pure javascript).
  
@@ -28,14 +29,14 @@ Available options :
  Supported events :
  
  * 'commandComplete' Fired when a command is completed.
- * 'cancel' Fired when a command was cancelled
+ * 'cancel' Fired when a command is cancelled.
 
 Simple javascript example :
 
 Type 'hello xxxxxx' or 'asyncHello xxxxxx' in the shell input to test.
 
 ```javascript
-shell = new ShellUI('input-element','shell-output-container');
+var shell = new ShellUI('input-element','shell-output-container');
 // Add normal command
 shell.addCommand('hello', function(name){
 	return 'You said hello to '+name;
