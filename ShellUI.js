@@ -285,8 +285,6 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
 	this.keyboardInteraction = function(e){
-		
-		
 		switch (e.keyCode) {
     		case 8:
         		if(this.keyboardSelected !== null){
@@ -313,7 +311,6 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		    default:
 		}
 	};
-	
 	// Init the shell UI when Dom is ready.
 	if( document.readyState === 'complete' ) {
 		this.init();
