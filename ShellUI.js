@@ -35,6 +35,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	this.init = function() {
 		this.inputElement = document.getElementById(this.inputElement);
 		this.inputElement.style['white-space'] = 'pre';
+		document.addEventListener("paste", this.pasteText.bind(this));		
 		if(this.endlineElement){
 			this.endlineElement = document.getElementById(this.endlineElement);
 		}
@@ -48,6 +49,31 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		document.addEventListener('keypress', this.keyboardCallback.bind(this));
 		document.addEventListener('keydown', this.keyboardInteraction.bind(this));
 		document.addEventListener('commandComplete', this.commandComplete.bind(this));
+	};
+	
+	this.pasteText = function(e){
+		
+		var textData = e.clipboardData.getData('text');
+		var previousTextData = this.inputElement.textContent;
+		
+		var htmlPut = '';
+		var i;
+		for(i=0;i<textData.length;i++){
+			htmlPut += '<span>'+textData[i]+'</span>';
+		}
+		if(this.keyboardSelected !== null){	
+			var newContent = '';
+			for(i=0;i<previousTextData.length;i++){
+				if(i === this.keyboardSelected){
+					newContent += htmlPut;
+				}
+				newContent += '<span>'+previousTextData[i]+'</span>';
+			}
+			this.inputElement.innerHTML = newContent;
+			this.keyboardSelected = this.keyboardSelected+textData.length;	  
+		}else{
+			this.inputElement.innerHTML += htmlPut;
+		}
 	};
 	
 	/**
@@ -124,7 +150,8 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * 
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
-	this.keyboardCallback = function(e){		
+	this.keyboardCallback = function(e){
+		
 		switch (e.keyCode) {
     		case 8:
         		break;        	
@@ -159,14 +186,17 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 						decodedChar = decodedChar.toLowerCase();
 					}
 					e.key = decodedChar;
-		    	}
-		    	if(this.keyboardSelected !== null){						
-					this.inputElement.insertBefore(this.createElement('span',e.key), this.inputElement.children[this.keyboardSelected]);
-					this.selectChar(this.keyboardSelected+1);					  
-				}else{
-					this.inputElement.append(this.createElement('span',e.key));
-				}	
+		    	}		    	
+		    	if(this.preventPaste === false){
+		    		if(this.keyboardSelected !== null){						
+						this.inputElement.insertBefore(this.createElement('span',e.key), this.inputElement.children[this.keyboardSelected]);
+						this.selectChar(this.keyboardSelected+1);					  
+					}else{
+						this.inputElement.append(this.createElement('span',e.key));
+					}	
+				}
 		}
+		this.preventPaste = false;
 	};
 	
 	/**
@@ -285,6 +315,10 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
 	this.keyboardInteraction = function(e){
+		if(e.keyIdentifier && e.keyIdentifier === 'Meta'){
+			this.preventPaste = true;
+			return;
+		}
 		switch (e.keyCode) {
     		case 8:
         		if(this.keyboardSelected !== null){
