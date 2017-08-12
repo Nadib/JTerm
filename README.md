@@ -17,7 +17,16 @@ Simple javascript example :
  
 ```javascript
 shell = new ShellUI('input-element','shell-output-container','input-endline-element', 'input-prefix-element');
+// Add normal command
 shell.addCommand('hello', function(name){
 	return 'You said hello to '+name;
 });
+// Add Async command
+shell.addCommand('asyncHello', function(name){
+	setTimeout(function(){
+		// Async command require event dispatch.
+  		var event = new CustomEvent('commandComplete', {detail:{returnContent:'You said hello asynchronously to '+name}});
+		document.dispatchEvent(event);	
+  	}, 3000);
+}, {async:true});
 ```
