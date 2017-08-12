@@ -34,13 +34,13 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 */
 	this.init = function() {
 		this.inputElement = document.getElementById(this.inputElement);
-		this.inputElement.style = 'white-space:pre;';
+		this.inputElement.style['white-space'] = 'pre';
 		if(this.endlineElement){
 			this.endlineElement = document.getElementById(this.endlineElement);
 		}
 		if(this.outputElement){
 			this.outputElement = document.getElementById(this.outputElement);
-			this.outputElement.style = 'white-space:pre;';
+			this.outputElement.style['white-space'] = 'pre';
 		}
 		if(this.prefixElement){
 			this.prefixElement = document.getElementById(this.prefixElement);
@@ -74,7 +74,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		 	this.printOutput('-ShellUI: '+commandName+': command not found');
 		}else{
 			if(this.prefixElement){
-				this.prefixElement.style = 'display:none';
+				this.prefixElement.style.display = 'none';
 			}			
 			this.commands[commandName].execute(arguments);
 		}
@@ -91,7 +91,7 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 		}
 		this.resetInput();
 		if(this.prefixElement){
-			this.prefixElement.style = 'display:auto';
+			this.prefixElement.style.display = 'inline';
 		}
 	};
 	
@@ -124,20 +124,20 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * 
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
-	this.keyboardCallback = function(e){
-		// Safari not support KeyboarEvent.key property at this time
-		if(e.key){
-			if(e.key != 'Enter'){
-				// Manage option+v for paste
-				// Manage CTRL+c to cancel the current command
-				if(this.keyboardSelected !== null){						
-					this.inputElement.insertBefore(this.createElement('span',e.key), this.inputElement.children[this.keyboardSelected]);
-					this.selectChar(this.keyboardSelected+1);					  
-				}else{
-					this.inputElement.append(this.createElement('span',e.key));
-				}			
-			}else{
-				var command = this.inputElement.textContent;
+	this.keyboardCallback = function(e){		
+		switch (e.keyCode) {
+    		case 8:
+        		break;        	
+        	case 37:
+        		break;
+        	case 39:
+        		break;
+        	case 38:
+        		break;
+        	case 40:
+        		break;
+        	case 13:
+        		var command = this.inputElement.textContent;
 				if(this.outputElement){
 					var displayText = ''; 
 					if(this.prefixElement){
@@ -151,8 +151,21 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 					this.commandHistory.push(command);
 					this.executeCommand(command);
 				}
-								
-			}
+        		break;
+		    default:
+		    	if(!e.key){
+		    		var decodedChar = String.fromCharCode(e.keyCode);
+					if(!e.shiftKey){
+						decodedChar = decodedChar.toLowerCase();
+					}
+					e.key = decodedChar;
+		    	}
+		    	if(this.keyboardSelected !== null){						
+					this.inputElement.insertBefore(this.createElement('span',e.key), this.inputElement.children[this.keyboardSelected]);
+					this.selectChar(this.keyboardSelected+1);					  
+				}else{
+					this.inputElement.append(this.createElement('span',e.key));
+				}	
 		}
 	};
 	
@@ -171,11 +184,16 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * @param {number} index - Index of the character to remove from the input box.
 	 */
 	this.removeChar = function (index){
+		
 		if(index === -1){
 			index = this.inputElement.children.length-1;
-		} 
+		}
+		
 		if(this.inputElement.children[index]){
+  			
+  			
 			this.inputElement.removeChild(this.inputElement.children[index]);
+			
 		}
 	};
 	
@@ -189,11 +207,11 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 			this.inputElement.children[this.keyboardSelected].classList.remove('shellui-highlight');
 		}
 		this.keyboardSelected = index;
-		if(this.keyboardSelected !== null && this.inputElement.children[this.keyboardSelected]){
-			this.endlineElement.style='display:none;';
+		if(this.keyboardSelected !== null && this.inputElement.children[this.keyboardSelected]){			
+			this.endlineElement.style.display = 'none';
 			this.inputElement.children[this.keyboardSelected].classList.add('shellui-highlight');
 		}else{
-			this.endlineElement.style='display:auto;';
+			this.endlineElement.style.display='inline';
 		}
 	};
 	
@@ -267,11 +285,13 @@ var ShellUI = function(inputElement, outputElement, endlineElement, prefixElemen
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
 	this.keyboardInteraction = function(e){
+		
+		
 		switch (e.keyCode) {
     		case 8:
         		if(this.keyboardSelected !== null){
 					if(this.keyboardSelected > 0){
-						this.removeChar(this.keyboardSelected-1);				
+						this.removeChar(this.keyboardSelected-1);			
 						this.selectChar(this.keyboardSelected-1);
 					}
 				}else{
