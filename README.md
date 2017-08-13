@@ -25,6 +25,9 @@ Available options :
 
  * prefix {string} Prefix for the shell input line, default '$'.
  * highlightColor {string} Highlight color, default value '#a5a5a5'.
+ * helpEnabled {boolean} Define if the help command is enabled, default value 'true'.
+ * language {string} Override the detected language, default value 'navigator.language'.
+ * failbackLanguage {string} The failback language, default 'en'.
  
  Supported events :
  

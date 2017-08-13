@@ -9,6 +9,9 @@
  * Available options :
  * 	- prefix {string} Prefix for the shell input, default value '$'.
  *  - highlightColor {string} Highlight color, default value '#a5a5a5'.
+ *  - helpEnabled {boolean} Define if the help command is enabled, default value 'true'.
+ *  - language {string} Override the detected language, default 'navigator.language'.
+ *  - failbackLanguage {string} The failback language, default 'en'.
  * 
  * Supported events :
  *  - commandComplete Fired when a command is completed.
@@ -27,34 +30,44 @@ var ShellUI = function(inputElement, outputElement, options) {
 	if(options.highlightColor === undefined){
 		options.highlightColor = '#a5a5a5';
 	}
-	/** @member {object} */
+	if(options.helpEnabled === undefined){
+		options.helpEnabled = true;
+	}
+	if(options.language === undefined){
+		options.language = navigator.language;
+	}
+	if(options.failbackLanguage === undefined){
+		options.failbackLanguage = 'en';
+	}
+	/** @member {object} Options object*/
 	this.options = options;
-	/** @member {Element} */
+	/** @member {Element} Dom element used as input, generally a span element. */
 	this.inputElement = inputElement;
-	/** @member {Element} */
+	/** @member {Element} Dom element used as shell output container.*/
 	this.outputElement = outputElement;
-	/** @member {Element} */
+	/** @member {Element} Endline element.*/
 	this.endlineElement = null;
-	/** @member {Element} */
+	/** @member {Element} Prefix element.*/
 	this.prefixElement = null;
-	/** @member {Number} */
+	/** @member {Number} Index of the current selected character.*/
 	this.keyboardSelected=null;
-	/** @member {Number} */
+	/** @member {Number} Index of the current browsed command history.*/
 	this.currentHistory=null;
-	/** @member {array} */
+	/** @member {array} History of executed commands.*/
 	this.commandHistory=[];
-	/** @member {object} */
+	/** @member {object} List of available commands.*/
 	this.commands={};
-	/** @member {boolean} */
+	/** @member {boolean} Prevent paste.*/
 	this.preventPaste=false;
-	/** @member {boolean} */
+	/** @member {boolean} True when ctrl key is pressed.*/
 	this.controlPressed=false;
-	/** @member {object} */
+	/** @member {object} Events listeners.*/
 	this.eventListeners = {};
-	/** @member {string} Current language */
-	this.language = navigator.language;
-	/** @member {string} Current default language */
-	this.defaultLanguage = 'en';
+	/** @member {string} Current language.*/
+	this.language = this.options.language;
+	/** @member {string} Current failback language.*/
+	this.failbackLanguage = this.options.failbackLanguage;
+	/** @member {object} Localized messages.*/
 	this.messages = {'command_not_found':{'af':'Opdrag nie gevind nie',
 										  'ar':'القيادة لم يتم العثور',
 										  'az':'Əmr tapılmadı',
@@ -172,7 +185,9 @@ var ShellUI = function(inputElement, outputElement, options) {
 		document.addEventListener('keydown', this.keyboardInteraction.bind(this));
 		document.addEventListener('keyup', this.keyboardUp.bind(this));
 		this.addEventListener('commandComplete', this.commandComplete.bind(this));
-		this.addCommand('help', this.helpCommand.bind(this));
+		if(this.options.helpEnabled === true){
+			this.addCommand('help', this.helpCommand.bind(this));
+		}
 	};
 	
 	/**
@@ -218,8 +233,8 @@ var ShellUI = function(inputElement, outputElement, options) {
 		if(this.messages[message][language]){
 			return this.messages[message][language];
 		}
-		if(this.messages[message][this.defaultLanguage]){
-			return this.messages[message][this.defaultLanguage];
+		if(this.messages[message][this.failbackLanguage]){
+			return this.messages[message][this.failbackLanguage];
 		}
 		return undefined;
 	};
@@ -604,17 +619,17 @@ var ShellUICommand = function(name, callback,shell, options) {
 	if(options === undefined){
 		options = {};
 	}
-	/** @member {string} */
+	/** @member {string} Command name.*/
 	this.name = name;
-	/** @member {function} */
+	/** @member {function} Command callback function.*/
 	this.callback = callback;
-	/** @member {ShellUI} */
+	/** @member {ShellUI} Shell instance.*/
 	this.shell = shell;
-	/** @member {object} */
+	/** @member {object} Command options.*/
 	this.options = options;
-	/** @member {string} */
+	/** @member {string} Command signature.*/
 	this.signature=null;
-	/** @member {boolean} */
+	/** @member {boolean} True when the command is cancelling.*/
 	this.cancel = false;
 
 	/**
