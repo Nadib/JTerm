@@ -11,11 +11,14 @@
   		return 'You said hello to '+name;
   	});
   	// Add Async command
-  	shell.addCommand('asyncHello', function(name){
+  	shell.addCommand('asyncHello', function(name, duration){
+  		if(duration === undefined){
+  			duration = 3000;
+  		}
   		setTimeout(function(){
-  			this.endCommand('You said hello asynchronously to '+name);		
-  		}.bind(this), 3000);
-  	}, {async:true});
+  			this.endCommand('You said hello asynchronously to '+name+' during '+duration+'ms');		
+  		}.bind(this), duration);
+  	}, {async:true , summary:'Async hello command.', help:'Long Help text'});
   </script>
 </head>
 <body>

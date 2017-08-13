@@ -18,7 +18,6 @@
  * @author Nadib Bandi
  */
 var ShellUI = function(inputElement, outputElement, options) {
-	
 	if(options === undefined){
 		options = {};
 	}
@@ -52,6 +51,107 @@ var ShellUI = function(inputElement, outputElement, options) {
 	this.controlPressed=false;
 	/** @member {object} */
 	this.eventListeners = {};
+	/** @member {string} Current language */
+	this.language = navigator.language;
+	/** @member {string} Current default language */
+	this.defaultLanguage = 'en';
+	this.messages = {'command_not_found':{'af':'Opdrag nie gevind nie',
+										  'ar':'القيادة لم يتم العثور',
+										  'az':'Əmr tapılmadı',
+										  'be':'каманда не знойдзена',
+										  'bg':'командата не е намерена',
+										  'bn':'কমান্ড পাওয়া যায় নি',
+										  'bs':'Naredba nije pronađena',
+										  'ca':'Comanda no trobada',
+										  'co':'Cumanda micca trovu',
+										  'cs':'příkaz nenalezen',
+										  'cy':'Gorchymyn heb ei ddarganfod',
+										  'da':'Kommando ikke fundet',
+										  'de':'befehl nicht gefunden',
+										  'el':'Εντολή δεν βρέθηκε',
+										  'en':'command not found',
+										  'eo':'Komando ne trovita',
+										  'es':'comando no encontrado',
+										  'et':'käsklust ei leitud',
+										  'fa':'فرمان یافت نشد',
+										  'fi':'komentoa ei löydy',
+										  'fr':'commande non trouvée',
+										  'fy':'Kommando net fûn',
+										  'ga':'Ordú nár aimsíodh',
+										  'gd':'Òrdugh gun lorg',
+										  'gl':'Comando non atopado',
+										  'gu':'આદેશ મળી નથી',
+										  'ha':'Umurnin ba a samu ba',
+										  'haw':"'a'ole i loa'a ka papa",
+										  'hi':'आदेश नहीं मिला',
+										  'hmn':'Txib tsis pom',
+										  'ht':'Kòmandman pa jwenn',
+										  'hu':'Parancs nem található',
+										  'hy':'Հրաման չի գտնվել',
+										  'id':'perintah tidak ditemukan',
+										  'ig':'Iwu achọtaghị',
+										  'is':'Stjórn fannst ekki',
+										  'it':'comando non trovato',
+										  'iw':'פקודה לא נמצאה',
+										  'ja':'コマンドが見つかりません',
+										  'jw':'Printah ora ditemokake',
+										  'ka':'ბრძანება ვერ მოიძებნა',
+										  'kk':'Команда табылмады',
+										  'km':'ពាក្យបញ្ជាមិនត្រូវបានរកឃើញ',
+										  'kn':'ಆದೇಶ ಕಂಡುಬಂದಿಲ್ಲ',
+										  'ko':'명령어를 찾을수 없음',
+										  'ku':'Ferman nedît',
+										  'ky':'буйрук табылган жок',
+										  'lb':'Kommando net fonnt',
+										  'lo':'ຄໍາສັ່ງບໍ່ພົບ',
+										  'lt':'komanda nerasta',
+										  'lv':'Komanda nav atrasta',
+										  'mg':'Baiko tsy hita',
+										  'mi':'Kaore i kitea',
+										  'mk':'Командата не е пронајдена',
+										  'ml':'ആജ്ഞ കണ്ടെത്തിയില്ല',
+										  'mn':'Тушаал олдсонгүй',
+										  'mr':'आदेश आढळला नाही',
+										  'ms':'Arahan tidak dijumpai',
+										  'mt':'Kmand ma nstabx',
+										  'my':'command ကိုမတွေ့ရှိ',
+										  'ne':'आदेश फेला परेन',
+										  'nl':'opdracht niet gevonden',
+										  'no':'kommando ikke funnet',
+										  'pa':'ਕਮਾਂਡ ਨਹੀਂ ਮਿਲੀ',
+										  'pl':'nie znaleziono polecenia',
+										  'ps':'کمانډ ونه موندل شو',
+										  'pt':'comando não encontrado',
+										  'ro':'comanda nu a fost găsită',
+										  'ru':'команда не найдена',
+										  'sd':'حڪم نه مليو',
+										  'si':'විධානය සොයාගත නොහැකි',
+										  'sk':'príkaz nenájdený',
+										  'sl':'Ukaz ni bil najden',
+										  'sq':'komanda nuk u gjet',
+										  'sm':'Poloaiga e le maua',
+										  'sn':'Raira isingawaniki',
+										  'so':'Amar ma helin',
+										  'sr':'Команда није пронађена',
+										  'su':'paréntah teu kapendak',
+										  'st':'Taelo e sa fumanoeng',
+										  'sv':'Kommando inte hittat',
+										  'sw':'Amri haipatikani',
+										  'ta':'கட்டளை காணப்படவில்லை',
+										  'te':'కమాండ్ కనుగొనబడలేద',
+										  'tg':'Фармоиш ёфт нашуд',
+										  'th':'ไม่พบคำสั่ง',
+										  'tl':'Hindi nakita ang utos',
+										  'tr':'komut bulunamadı',
+										  'uk':'Команди не знайдено',
+										  'ur':'کمانڈ نہیں ملا',
+										  'uz':'Buyruqlar topilmadi',
+										  'vi':'lệnh không tìm thấy',
+										  'xh':'Umyalelo awufumanekanga',
+										  'yo':'Aṣẹ ko ri',
+										  'zh':'找不到命令',
+										  'zh-TW':'找不到命令',
+										  'zu':'Umyalo awutholakali'}};
 	
 	/**
 	 * Initialize the shellUI after dom ready event.
@@ -71,8 +171,57 @@ var ShellUI = function(inputElement, outputElement, options) {
 		document.addEventListener('keypress', this.keyboardCallback.bind(this));
 		document.addEventListener('keydown', this.keyboardInteraction.bind(this));
 		document.addEventListener('keyup', this.keyboardUp.bind(this));
-
 		this.addEventListener('commandComplete', this.commandComplete.bind(this));
+		this.addCommand('help', this.helpCommand.bind(this));
+	};
+	
+	/**
+	 * Help command.
+	 * 
+	 * @param {string} command - Command name.
+	 */
+	this.helpCommand = function(command){
+		var helpText = '';
+		if(command === undefined){
+			helpText = 'List of commands available : \r\n\r\n';
+			for (var prop in this.commands) {
+				if(prop !== 'help'){					
+					helpText += ' - '+this.commands[prop].getHelp(true)+'\r\n';
+				}
+			}
+			helpText += '\r\n Type help [command] to get help from more specific command';
+		}else if(command){
+			if(this.commands[command] === undefined){
+				helpText += command+' : '+this.getMessage('command_not_found');
+			}else{
+				helpText += this.commands[command].getHelp();	
+			}		
+		}
+		return helpText;
+	};
+	
+	/**
+	 * Get message
+	 * 
+	 * @param {string} message - The message identifier.
+	 * @param {string} language - If set the specific language to get.
+	 * 
+	 * @return {string} The message.
+	 */
+	this.getMessage = function(message, language){
+		if(!this.messages[message]){
+			return undefined;
+		}
+		if(language === undefined){
+			language = this.language;
+		}
+		if(this.messages[message][language]){
+			return this.messages[message][language];
+		}
+		if(this.messages[message][this.defaultLanguage]){
+			return this.messages[message][this.defaultLanguage];
+		}
+		return undefined;
 	};
 	
 	/**
@@ -170,7 +319,7 @@ var ShellUI = function(inputElement, outputElement, options) {
 		var commandName = commandDatas[0];
 		var arguments = commandDatas.slice(1);
 		if(!this.commands[commandName]){
-		 	this.printOutput('-ShellUI: '+commandName+': command not found');
+		 	this.printOutput('-ShellUI: '+commandName+': '+this.getMessage('command_not_found'));
 		}else{
 			this.prefixElement.style.display = 'none';
 			this.commands[commandName].execute(arguments);
@@ -257,7 +406,6 @@ var ShellUI = function(inputElement, outputElement, options) {
 						this.dispatchEvent(event);		    			
 		    			return;
 		    		}
-		    		
 		    		if(this.keyboardSelected !== null){						
 						this.inputElement.insertBefore(this.createElement('span',e.key), this.inputElement.children[this.keyboardSelected]);
 						this.selectChar(this.keyboardSelected+1);					  
@@ -373,7 +521,11 @@ var ShellUI = function(inputElement, outputElement, options) {
 		}
 	};
 	
-	
+	/**
+	 * KeyboardUp callback
+	 * 
+	 * @param {KeyboardEvent} e - KeyboardEvent.
+	 */
 	this.keyboardUp = function(e){
 		if(e.keyIdentifier == 'Control' || e.key === 'Control'){
 			this.controlPressed = false;
@@ -395,7 +547,6 @@ var ShellUI = function(inputElement, outputElement, options) {
 			this.preventPaste = true;
 			return;
 		}
-		
 		if(e.keyIdentifier == 'Control' || e.key === 'Control'){
 			this.controlPressed = true;
 			return;
@@ -444,23 +595,28 @@ var ShellUI = function(inputElement, outputElement, options) {
  * 
  * List of available options :
  * 	async {boolean} true if the command is asynchronous.
+ *  summary {string} short description.
  * 
  * @license Apache-2.0
  * @author Nadib Bandi
  */
 var ShellUICommand = function(name, callback,shell, options) {
+	if(options === undefined){
+		options = {};
+	}
 	/** @member {string} */
 	this.name = name;
 	/** @member {function} */
 	this.callback = callback;
+	/** @member {ShellUI} */
+	this.shell = shell;
 	/** @member {object} */
 	this.options = options;
-	this.shell = shell;
-	if(this.options === undefined){
-		this.options = {};
-	}
+	/** @member {string} */
+	this.signature=null;
+	/** @member {boolean} */
 	this.cancel = false;
-	
+
 	/**
 	 * Execute the command
 	 * 
@@ -480,6 +636,24 @@ var ShellUICommand = function(name, callback,shell, options) {
 	};
 	
 	/**
+	 * Get the command signature.
+	 * @return {string}
+	 */
+	this.getSignature = function(){
+		if(this.signature===null){
+			var args = this.callback.toString ().
+              	replace (/[\r\n\s]+/g, ' ').
+              	match (/function\s*\w*\s*\((.*?)\)/)[1].split (/\s*,\s*/);
+            this.signature = this.name;
+            var j;
+            for(j=0;j<args.length;j++){
+            	this.signature += ' ['+args[j]+']';
+            }
+		}
+		return this.signature;
+	};
+	
+	/**
 	 * Ending the command.
 	 * 
 	 * @param {string} returnContent - content returned.
@@ -489,6 +663,27 @@ var ShellUICommand = function(name, callback,shell, options) {
 			var event = new ShellUIEvent('commandComplete', {returnContent:returnContent, command:this});
 			this.shell.dispatchEvent(event);
 		}
+	};
+	
+	/**
+	 * Get Help
+	 * 
+	 * @param {boolean} summary - If true return only a short summary.
+	 * 
+	 * @return {string} The help text.
+	 */
+	this.getHelp = function(summary){
+		var helpText = this.getSignature();
+		if(this.options.summary){
+			helpText += ' '+this.options.summary;
+		}
+		if(summary === true){
+			return helpText;
+		}
+		if(this.options.help){
+			helpText += ' \r\n'+this.options.help;
+		}
+		return helpText;
 	};
 	
 	/**
@@ -515,7 +710,10 @@ var ShellUICommand = function(name, callback,shell, options) {
  * @author Nadib Bandi
  */
 var ShellUIEvent = function(name, options) {
+	/** @member {string} name - Event name */
 	this.name = name;
+	/** @member {object} options - Event options */
 	this.options = options;
+	/** @member {mixed} target - Event target */
 	this.target=null;
 };

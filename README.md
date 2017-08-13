@@ -36,15 +36,18 @@ Simple javascript example :
 Type 'hello xxxxxx' or 'asyncHello xxxxxx' in the shell input to test.
 
 ```javascript
-var shell = new ShellUI('input-element','shell-output-container');
-// Add normal command
-shell.addCommand('hello', function(name){
-	return 'You said hello to '+name;
-});
-// Add Async command
-shell.addCommand('asyncHello', function(name){
-	setTimeout(function(){
-  		this.endCommand('You said hello asynchronously to '+name);		
-  	}.bind(this), 3000);
-}, {async:true});
+  	var shell = new ShellUI('input-element','shell-output-container');
+  	// Add normal command
+  	shell.addCommand('hello', function(name){
+  		return 'You said hello to '+name;
+  	});
+  	// Add Async command
+  	shell.addCommand('asyncHello', function(name, duration){
+  		if(duration === undefined){
+  			duration = 3000;
+  		}
+  		setTimeout(function(){
+  			this.endCommand('You said hello asynchronously to '+name+' during '+duration+'ms');		
+  		}.bind(this), duration);
+  	}, {async:true , summary:'Async hello command.', help:'Long Help text'});
 ```
