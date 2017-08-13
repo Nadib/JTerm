@@ -70,6 +70,8 @@ var ShellUI = function(inputElement, outputElement, options) {
 		this.inputElement.parentElement.insertBefore(this.prefixElement, this.inputElement);		
 		document.addEventListener('keypress', this.keyboardCallback.bind(this));
 		document.addEventListener('keydown', this.keyboardInteraction.bind(this));
+		document.addEventListener('keyup', this.keyboardUp.bind(this));
+
 		this.addEventListener('commandComplete', this.commandComplete.bind(this));
 	};
 	
@@ -249,9 +251,8 @@ var ShellUI = function(inputElement, outputElement, options) {
 					e.key = decodedChar;
 		    	}		    	
 		    	if(this.preventPaste === false){
-		    		if(this.controlPressed === true && e.keyCode === 3){
+		    		if(this.controlPressed === true && (e.key === 'c' || e.keyCode === 3)){
 		    			this.resetInput();
-		    			this.controlPressed === false;
 		    			var event = new ShellUIEvent('cancel', {});
 						this.dispatchEvent(event);		    			
 		    			return;
@@ -265,7 +266,6 @@ var ShellUI = function(inputElement, outputElement, options) {
 					}
 				}
 		}
-		this.preventPaste = false;
 	};
 	
 	/**
@@ -298,12 +298,12 @@ var ShellUI = function(inputElement, outputElement, options) {
 	 */
 	this.selectChar = function(index){
 		if(this.keyboardSelected !== null && this.inputElement.children[this.keyboardSelected]){
-			this.inputElement.children[this.keyboardSelected].classList.remove('shellui-highlight');
+			this.inputElement.children[this.keyboardSelected].style['background-color'] = 'transparent';
 		}
 		this.keyboardSelected = index;
 		if(this.keyboardSelected !== null && this.inputElement.children[this.keyboardSelected]){			
-			this.endlineElement.style.display = 'none';
-			this.inputElement.children[this.keyboardSelected].classList.add('shellui-highlight');
+			this.endlineElement.style.display = 'none';			
+			this.inputElement.children[this.keyboardSelected].style['background-color'] = this.options.highlightColor;
 		}else{
 			this.endlineElement.style.display='inline';
 		}
@@ -373,16 +373,29 @@ var ShellUI = function(inputElement, outputElement, options) {
 		}
 	};
 	
+	
+	this.keyboardUp = function(e){
+		if(e.keyIdentifier == 'Control' || e.key === 'Control'){
+			this.controlPressed = false;
+			return;
+		}
+		if((e.keyIdentifier && e.keyIdentifier === 'Meta') || (e.key && e.key === 'Meta')){
+			this.preventPaste = false;
+			return;
+		}
+	};
+	
 	/**
 	 * Callback for special keyboard actions : 'delete', 'left', 'right', 'top', 'bottom'.
 	 * 
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
 	this.keyboardInteraction = function(e){
-		if(e.keyIdentifier && e.keyIdentifier === 'Meta'){
+		if((e.keyIdentifier && e.keyIdentifier === 'Meta') || (e.key && e.key === 'Meta')){
 			this.preventPaste = true;
 			return;
 		}
+		
 		if(e.keyIdentifier == 'Control' || e.key === 'Control'){
 			this.controlPressed = true;
 			return;
