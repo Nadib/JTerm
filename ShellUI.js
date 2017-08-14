@@ -39,6 +39,11 @@ var ShellUI = function(inputElement, outputElement, options) {
 	if(options.failbackLanguage === undefined){
 		options.failbackLanguage = 'en';
 	}
+	
+	
+
+
+	
 	/** @member {object} Options object*/
 	this.options = options;
 	/** @member {Element} Dom element used as input, generally a span element. */
@@ -67,104 +72,6 @@ var ShellUI = function(inputElement, outputElement, options) {
 	this.language = this.options.language;
 	/** @member {string} Current failback language.*/
 	this.failbackLanguage = this.options.failbackLanguage;
-	/** @member {object} Localized messages.*/
-	this.messages = {'command_not_found':{'af':'Opdrag nie gevind nie',
-										  'ar':'القيادة لم يتم العثور',
-										  'az':'Əmr tapılmadı',
-										  'be':'каманда не знойдзена',
-										  'bg':'командата не е намерена',
-										  'bn':'কমান্ড পাওয়া যায় নি',
-										  'bs':'Naredba nije pronađena',
-										  'ca':'Comanda no trobada',
-										  'co':'Cumanda micca trovu',
-										  'cs':'příkaz nenalezen',
-										  'cy':'Gorchymyn heb ei ddarganfod',
-										  'da':'Kommando ikke fundet',
-										  'de':'befehl nicht gefunden',
-										  'el':'Εντολή δεν βρέθηκε',
-										  'en':'command not found',
-										  'eo':'Komando ne trovita',
-										  'es':'comando no encontrado',
-										  'et':'käsklust ei leitud',
-										  'fa':'فرمان یافت نشد',
-										  'fi':'komentoa ei löydy',
-										  'fr':'commande non trouvée',
-										  'fy':'Kommando net fûn',
-										  'ga':'Ordú nár aimsíodh',
-										  'gd':'Òrdugh gun lorg',
-										  'gl':'Comando non atopado',
-										  'gu':'આદેશ મળી નથી',
-										  'ha':'Umurnin ba a samu ba',
-										  'haw':"'a'ole i loa'a ka papa",
-										  'hi':'आदेश नहीं मिला',
-										  'hmn':'Txib tsis pom',
-										  'ht':'Kòmandman pa jwenn',
-										  'hu':'Parancs nem található',
-										  'hy':'Հրաման չի գտնվել',
-										  'id':'perintah tidak ditemukan',
-										  'ig':'Iwu achọtaghị',
-										  'is':'Stjórn fannst ekki',
-										  'it':'comando non trovato',
-										  'iw':'פקודה לא נמצאה',
-										  'ja':'コマンドが見つかりません',
-										  'jw':'Printah ora ditemokake',
-										  'ka':'ბრძანება ვერ მოიძებნა',
-										  'kk':'Команда табылмады',
-										  'km':'ពាក្យបញ្ជាមិនត្រូវបានរកឃើញ',
-										  'kn':'ಆದೇಶ ಕಂಡುಬಂದಿಲ್ಲ',
-										  'ko':'명령어를 찾을수 없음',
-										  'ku':'Ferman nedît',
-										  'ky':'буйрук табылган жок',
-										  'lb':'Kommando net fonnt',
-										  'lo':'ຄໍາສັ່ງບໍ່ພົບ',
-										  'lt':'komanda nerasta',
-										  'lv':'Komanda nav atrasta',
-										  'mg':'Baiko tsy hita',
-										  'mi':'Kaore i kitea',
-										  'mk':'Командата не е пронајдена',
-										  'ml':'ആജ്ഞ കണ്ടെത്തിയില്ല',
-										  'mn':'Тушаал олдсонгүй',
-										  'mr':'आदेश आढळला नाही',
-										  'ms':'Arahan tidak dijumpai',
-										  'mt':'Kmand ma nstabx',
-										  'my':'command ကိုမတွေ့ရှိ',
-										  'ne':'आदेश फेला परेन',
-										  'nl':'opdracht niet gevonden',
-										  'no':'kommando ikke funnet',
-										  'pa':'ਕਮਾਂਡ ਨਹੀਂ ਮਿਲੀ',
-										  'pl':'nie znaleziono polecenia',
-										  'ps':'کمانډ ونه موندل شو',
-										  'pt':'comando não encontrado',
-										  'ro':'comanda nu a fost găsită',
-										  'ru':'команда не найдена',
-										  'sd':'حڪم نه مليو',
-										  'si':'විධානය සොයාගත නොහැකි',
-										  'sk':'príkaz nenájdený',
-										  'sl':'Ukaz ni bil najden',
-										  'sq':'komanda nuk u gjet',
-										  'sm':'Poloaiga e le maua',
-										  'sn':'Raira isingawaniki',
-										  'so':'Amar ma helin',
-										  'sr':'Команда није пронађена',
-										  'su':'paréntah teu kapendak',
-										  'st':'Taelo e sa fumanoeng',
-										  'sv':'Kommando inte hittat',
-										  'sw':'Amri haipatikani',
-										  'ta':'கட்டளை காணப்படவில்லை',
-										  'te':'కమాండ్ కనుగొనబడలేద',
-										  'tg':'Фармоиш ёфт нашуд',
-										  'th':'ไม่พบคำสั่ง',
-										  'tl':'Hindi nakita ang utos',
-										  'tr':'komut bulunamadı',
-										  'uk':'Команди не знайдено',
-										  'ur':'کمانڈ نہیں ملا',
-										  'uz':'Buyruqlar topilmadi',
-										  'vi':'lệnh không tìm thấy',
-										  'xh':'Umyalelo awufumanekanga',
-										  'yo':'Aṣẹ ko ri',
-										  'zh':'找不到命令',
-										  'zh-TW':'找不到命令',
-										  'zu':'Umyalo awutholakali'}};
 	
 	/**
 	 * Initialize the shellUI after dom ready event.
@@ -172,12 +79,21 @@ var ShellUI = function(inputElement, outputElement, options) {
 	this.init = function() {
 		this.inputElement = document.getElementById(this.inputElement);
 		this.inputElement.style['white-space'] = 'pre';
-		document.addEventListener("paste", this.pasteText.bind(this));	
+		
+		document.addEventListener("dragover", function( event ) {
+      		// prevent default to allow drop
+      		event.preventDefault();
+  		}, false);
+ 		document.addEventListener("drop", this.dropText.bind(this));
+		document.addEventListener("paste", this.pasteText.bind(this));
+
 		this.outputElement = document.getElementById(this.outputElement);
 		this.outputElement.style['white-space'] = 'pre';
 		this.endlineElement = this.createElement('span', ' ');
 		this.endlineElement.style['background-color'] = this.options.highlightColor;
 		this.endlineElement.style['white-space'] = 'pre';
+		this.endlineElement.style['padding-left'] = '3px';
+  
 		this.inputElement.parentElement.insertBefore(this.endlineElement, this.inputElement.nextSibling);
 		this.prefixElement = this.createElement('span', this.options.prefix+' ');
 		this.inputElement.parentElement.insertBefore(this.prefixElement, this.inputElement);		
@@ -188,6 +104,16 @@ var ShellUI = function(inputElement, outputElement, options) {
 		if(this.options.helpEnabled === true){
 			this.addCommand('help', this.helpCommand.bind(this));
 		}
+		
+		var languageScript = document.createElement("script");
+		languageScript.src = "languages/"+this.language+'.js';
+		document.body.appendChild(languageScript);
+		if(this.language !== this.failbackLanguage){
+			var languageScript2 = document.createElement("script");
+			languageScript2.src = "languages/"+this.failbackLanguage+'.js';
+			document.body.appendChild(languageScript2);
+		}
+		
 	};
 	
 	/**
@@ -198,16 +124,16 @@ var ShellUI = function(inputElement, outputElement, options) {
 	this.helpCommand = function(command){
 		var helpText = '';
 		if(command === undefined){
-			helpText = 'List of commands available : \r\n\r\n';
+			helpText = this.getMessage('command_list_title')+'\r\n\r\n';
 			for (var prop in this.commands) {
 				if(prop !== 'help'){					
 					helpText += ' - '+this.commands[prop].getHelp(true)+'\r\n';
 				}
 			}
-			helpText += '\r\n Type help [command] to get help from more specific command';
+			helpText += '\r\n '+this.getMessage('command_help');
 		}else if(command){
 			if(this.commands[command] === undefined){
-				helpText += command+' : '+this.getMessage('command_not_found');
+				helpText += this.getMessage('command_not_found').printf(command);
 			}else{
 				helpText += this.commands[command].getHelp();	
 			}		
@@ -223,19 +149,17 @@ var ShellUI = function(inputElement, outputElement, options) {
 	 * 
 	 * @return {string} The message.
 	 */
-	this.getMessage = function(message, language){
-		if(!this.messages[message]){
-			return undefined;
-		}
+	this.getMessage = function(message, language){		
 		if(language === undefined){
 			language = this.language;
 		}
-		if(this.messages[message][language]){
-			return this.messages[message][language];
+		if(ShellUILanguage[language] && ShellUILanguage[language][message]){
+			return ShellUILanguage[language][message];
 		}
-		if(this.messages[message][this.failbackLanguage]){
-			return this.messages[message][this.failbackLanguage];
+		if(ShellUILanguage[this.failbackLanguage] && ShellUILanguage[this.failbackLanguage][message]){
+			return ShellUILanguage[this.failbackLanguage][message];
 		}
+		
 		return undefined;
 	};
 	
@@ -286,12 +210,38 @@ var ShellUI = function(inputElement, outputElement, options) {
 	};
 	
 	/**
+	 * Drop callback
+	 */
+	this.dropText = function(e){
+		e.preventDefault();
+		var dropVal = '';
+		if(e.dataTransfer.files.length > 0){
+			var i;
+			for(i=0;i<e.dataTransfer.files.length;i++){
+				if(i>0){
+					dropVal += ' ';
+				}
+				dropVal += e.dataTransfer.files[i].name;
+			}
+		}else{
+			dropVal = e.dataTransfer.getData('text');
+		}
+		this.pasteText(dropVal);
+	};
+	
+	/**
 	 * Javascript paste event callback
 	 * 
-	 * @param {ClipboardEvent} e - The clipboard event.
+	 * @param {ClipboardEvent/string} e - The clipboard event.
 	 */
 	this.pasteText = function(e){
-		var textData = e.clipboardData.getData('text');
+		var textData='';
+		if (typeof e === 'string') {
+			textData = e;
+		}else{
+			textData = e.clipboardData.getData('text');
+		}
+		
 		var previousTextData = this.inputElement.textContent;
 		var htmlPut = '';
 		var i;
@@ -330,16 +280,16 @@ var ShellUI = function(inputElement, outputElement, options) {
 	 * @return {mixed} The command return value or null.
 	 */
 	this.executeCommand = function(command){
+		
 		var commandDatas = command.split(/[ ]+/);
 		var commandName = commandDatas[0];
 		var arguments = commandDatas.slice(1);
 		if(!this.commands[commandName]){
-		 	this.printOutput('-ShellUI: '+commandName+': '+this.getMessage('command_not_found'));
+		 	this.printOutput(this.getMessage('command_not_found').printf(commandName));
 		}else{
 			this.prefixElement.style.display = 'none';
 			this.commands[commandName].execute(arguments);
 		}
-		this.currentHistory=null;
 	};
 	
 	/**
@@ -405,6 +355,8 @@ var ShellUI = function(inputElement, outputElement, options) {
 					this.commandHistory.push(command);
 					this.executeCommand(command);
 				}
+				this.outputElement.parentNode.scrollTop = this.outputElement.parentNode.scrollHeight;
+				this.currentHistory=null;
         		break;
 		    default:
 		    	if(!e.key){
@@ -642,7 +594,7 @@ var ShellUICommand = function(name, callback,shell, options) {
 	this.execute = function(arguments){
 		this.cancel = false;
 		this.shell.removeEventListener('cancel', this.cancelBound);
-		this.shell.addEventListener('cancel', this.cancelBound);		
+		this.shell.addEventListener('cancel', this.cancelBound);
 		if(this.options.async === true){
 			this.callback.apply(this, arguments);
 		}else{
@@ -731,4 +683,12 @@ var ShellUIEvent = function(name, options) {
 	this.options = options;
 	/** @member {mixed} target - Event target */
 	this.target=null;
+};
+var ShellUILanguage = {};
+String.prototype.printf = function () {
+  var args = arguments;
+  var i=0;
+  return this.replace(/(%s)/g, function () {
+    return args[i++];
+  });
 };

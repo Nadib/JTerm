@@ -1,8 +1,10 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Javascript ShellUI</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="ShellUI.css">
   <script src="ShellUI.js"></script>
   <script type="text/javascript">
   	var shell = new ShellUI('input-element','shell-output-container');
@@ -22,10 +24,12 @@
   </script>
 </head>
 <body>
-	<p>Welcome to Javascript ShellUI</p>
-	<div id="shell-output-container"></div>
-	 <div>
-	 	<span id="input-element"></span>
-	 </div>
+	<div style="background-color:#000000;width:100%;text-align:center;height:100%;">
+	<div class="shell-container">
+		Welcome to Javascript ShellUI
+		<div id="shell-output-container"></div>
+	 	<div><span id="input-element"></span></div>
+	</div>
+	</div>
 </body>
 </html>
