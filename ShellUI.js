@@ -40,10 +40,6 @@ var ShellUI = function(inputElement, outputElement, options) {
 		options.failbackLanguage = 'en';
 	}
 	
-	
-
-
-	
 	/** @member {object} Options object*/
 	this.options = options;
 	/** @member {Element} Dom element used as input, generally a span element. */
@@ -105,15 +101,17 @@ var ShellUI = function(inputElement, outputElement, options) {
 			this.addCommand('help', this.helpCommand.bind(this));
 		}
 		
-		var languageScript = document.createElement("script");
-		languageScript.src = "languages/"+this.language+'.js';
-		document.body.appendChild(languageScript);
+		this.loadDependancy("languages/"+this.language+'.js');
 		if(this.language !== this.failbackLanguage){
-			var languageScript2 = document.createElement("script");
-			languageScript2.src = "languages/"+this.failbackLanguage+'.js';
-			document.body.appendChild(languageScript2);
+			this.loadDependancy("languages/"+this.failbackLanguage+'.js');
 		}
-		
+	};
+	
+	this.loadDependancy=function(file){
+		var script = document.createElement("script");
+		script.type = 'text/javascript';
+		script.src = file;
+		document.body.appendChild(script);
 	};
 	
 	/**
@@ -132,7 +130,7 @@ var ShellUI = function(inputElement, outputElement, options) {
 			}
 			helpText += '\r\n '+this.getMessage('command_help');
 		}else if(command){
-			if(this.commands[command] === undefined){
+			if(this.getCommand(command) === null){
 				helpText += this.getMessage('command_not_found').printf(command);
 			}else{
 				helpText += this.commands[command].getHelp();	
@@ -214,19 +212,19 @@ var ShellUI = function(inputElement, outputElement, options) {
 	 */
 	this.dropText = function(e){
 		e.preventDefault();
-		var dropVal = '';
+		var vl = '';
 		if(e.dataTransfer.files.length > 0){
 			var i;
 			for(i=0;i<e.dataTransfer.files.length;i++){
 				if(i>0){
-					dropVal += ' ';
+					vl += ' ';
 				}
-				dropVal += e.dataTransfer.files[i].name;
+				vl += e.dataTransfer.files[i].name;
 			}
 		}else{
-			dropVal = e.dataTransfer.getData('text');
+			vl = e.dataTransfer.getData('text');
 		}
-		this.pasteText(dropVal);
+		this.pasteText(vl);
 	};
 	
 	/**
@@ -235,31 +233,30 @@ var ShellUI = function(inputElement, outputElement, options) {
 	 * @param {ClipboardEvent/string} e - The clipboard event.
 	 */
 	this.pasteText = function(e){
-		var textData='';
+		var tx='';
 		if (typeof e === 'string') {
-			textData = e;
+			tx = e;
 		}else{
-			textData = e.clipboardData.getData('text');
+			tx = e.clipboardData.getData('text');
 		}
-		
-		var previousTextData = this.inputElement.textContent;
-		var htmlPut = '';
+		var ptx = this.inputElement.textContent;
+		var ptp = '';
 		var i;
-		for(i=0;i<textData.length;i++){
-			htmlPut += '<span>'+textData[i]+'</span>';
+		for(i=0;i<tx.length;i++){
+			ptp += '<span>'+tx[i]+'</span>';
 		}
 		if(this.keyboardSelected !== null){	
 			var newContent = '';
-			for(i=0;i<previousTextData.length;i++){
+			for(i=0;i<ptx.length;i++){
 				if(i === this.keyboardSelected){
-					newContent += htmlPut;
+					newContent += ptp;
 				}
-				newContent += '<span>'+previousTextData[i]+'</span>';
+				newContent += '<span>'+ptx[i]+'</span>';
 			}
 			this.inputElement.innerHTML = newContent;
 			this.keyboardSelected = this.keyboardSelected+textData.length;	  
 		}else{
-			this.inputElement.innerHTML += htmlPut;
+			this.inputElement.innerHTML += ptp;
 		}
 	};
 	
@@ -273,6 +270,13 @@ var ShellUI = function(inputElement, outputElement, options) {
 		this.commands[name] = new ShellUICommand(name, callback, this, options);
 	};
 	
+	this.getCommand = function(name){
+		if(this.commands[name]){
+			return this.commands[name];
+		}
+		return null;
+	};
+	
 	/**
 	 * Execute a command.
 	 * 
@@ -280,15 +284,13 @@ var ShellUI = function(inputElement, outputElement, options) {
 	 * @return {mixed} The command return value or null.
 	 */
 	this.executeCommand = function(command){
-		
-		var commandDatas = command.split(/[ ]+/);
-		var commandName = commandDatas[0];
-		var arguments = commandDatas.slice(1);
-		if(!this.commands[commandName]){
+		var parser = new ShellUICommandParser(command);
+		var commandInstance = this.getCommand(parser.command);
+		if(commandInstance === null){
 		 	this.printOutput(this.getMessage('command_not_found').printf(commandName));
 		}else{
 			this.prefixElement.style.display = 'none';
-			this.commands[commandName].execute(arguments);
+			commandInstance.execute(parser.getArguments());
 		}
 	};
 	
@@ -323,10 +325,10 @@ var ShellUI = function(inputElement, outputElement, options) {
 	 * @return {Element} The created dom element.
 	 */
 	this.createElement = function(type, text){
-		var newElement = document.createElement(type);
-		var textNode = document.createTextNode(text);
-		newElement.appendChild(textNode);
-		return newElement;
+		var ne = document.createElement(type);
+		var tn = document.createTextNode(text);
+		ne.appendChild(tn);
+		return ne;
 	};
 	
 	/**
@@ -335,7 +337,6 @@ var ShellUI = function(inputElement, outputElement, options) {
 	 * @param {KeyboardEvent} e - The dispatched keyboard event.
 	 */
 	this.keyboardCallback = function(e){
-		
 		switch (e.keyCode) {
     		case 8:
         		break;        	
@@ -348,29 +349,29 @@ var ShellUI = function(inputElement, outputElement, options) {
         	case 40:
         		break;
         	case 13:
-        		var command = this.inputElement.textContent;
-				this.printOutput(this.prefixElement.textContent+command);
+        		var cmd = this.inputElement.textContent;
+				this.printOutput(this.prefixElement.textContent+cmd);
 				this.resetInput();
-				if(command){
-					this.commandHistory.push(command);
-					this.executeCommand(command);
+				if(cmd){
+					this.commandHistory.push(cmd);
+					this.executeCommand(cmd);
 				}
 				this.outputElement.parentNode.scrollTop = this.outputElement.parentNode.scrollHeight;
 				this.currentHistory=null;
         		break;
 		    default:
 		    	if(!e.key){
-		    		var decodedChar = String.fromCharCode(e.keyCode);
+		    		var dec = String.fromCharCode(e.keyCode);
 					if(!e.shiftKey){
-						decodedChar = decodedChar.toLowerCase();
+						dec = dec.toLowerCase();
 					}
-					e.key = decodedChar;
+					e.key = dec;
 		    	}		    	
 		    	if(this.preventPaste === false){
 		    		if(this.controlPressed === true && (e.key === 'c' || e.keyCode === 3)){
 		    			this.resetInput();
-		    			var event = new ShellUIEvent('cancel', {});
-						this.dispatchEvent(event);		    			
+		    			var ev = new ShellUIEvent('cancel', {});
+						this.dispatchEvent(ev);		    			
 		    			return;
 		    		}
 		    		if(this.keyboardSelected !== null){						
@@ -552,6 +553,28 @@ var ShellUI = function(inputElement, outputElement, options) {
 	}
 };
 
+var ShellUICommandParser = function(command){
+	var cd = command.match(/'[^']*'|"[^"]*"|\S+/g) || [];
+	this.command = cd[0];
+	this.arguments=[];
+	var i=1;
+	for(i=1;i<cd.length;i++){
+		if(cd[i][0] === '"' && cd[i][(cd[i].length-1)] === '"'){
+			cd[i] = cd[i].substr(1);
+			cd[i] = cd[i].substr( 0, cd[i].length-1);
+		}else if(cd[i][0] === "'" && cd[i][(cd[i].length-1)] === "'"){
+			cd[i] = cd[i].substr(1);
+			cd[i] = cd[i].substr( 0, cd[i].length-1);
+		}
+		this.arguments.push(cd[i]);
+	}	
+	
+	this.getArguments = function(){
+		return this.arguments;
+	};
+		
+};
+
 /**
  * Shell UI command.
  * @constructor
@@ -608,16 +631,28 @@ var ShellUICommand = function(name, callback,shell, options) {
 	 */
 	this.getSignature = function(){
 		if(this.signature===null){
-			var args = this.callback.toString ().
-              	replace (/[\r\n\s]+/g, ' ').
-              	match (/function\s*\w*\s*\((.*?)\)/)[1].split (/\s*,\s*/);
-            this.signature = this.name;
-            var j;
+			this.signature = this.name;
+			var j;
+			var args=this.getArguments();
             for(j=0;j<args.length;j++){
             	this.signature += ' ['+args[j]+']';
             }
 		}
 		return this.signature;
+	};
+	
+	this.getArguments=function(){
+		if(!this.arguments){
+			this.arguments = [];
+			var args = this.callback.toString ().
+              	replace (/[\r\n\s]+/g, ' ').
+              	match (/function\s*\w*\s*\((.*?)\)/)[1].split (/\s*,\s*/);
+              	var j;
+            	for(j=0;j<args.length;j++){
+            		this.arguments.push(' ['+args[j]+']');
+            	}
+		}
+		return this.arguments;		
 	};
 	
 	/**
@@ -684,6 +719,7 @@ var ShellUIEvent = function(name, options) {
 	/** @member {mixed} target - Event target */
 	this.target=null;
 };
+
 var ShellUILanguage = {};
 String.prototype.printf = function () {
   var args = arguments;
@@ -692,3 +728,5 @@ String.prototype.printf = function () {
     return args[i++];
   });
 };
+
+
