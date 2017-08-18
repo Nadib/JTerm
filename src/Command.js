@@ -107,7 +107,7 @@ ShellUICommand.prototype.getHelp = function(summary){
 		return helpText;
 	}
 	if(this.options.help){
-		helpText += ' \r\n'+this.options.help;
+		helpText += " \r\n"+this.options.help;
 	}
 	return helpText;
 };

@@ -26,12 +26,12 @@ var ShellUI = function(inputElement, outputElement, options) {
 	
 	/** @member {Object} options - ShellUI options.*/
 	this.options = Object.assign( {
-		prefix : '$',
-		highlightColor : '#a5a5a5',
+		prefix : "$",
+		highlightColor : "#a5a5a5",
 		helpEnabled : true,
 		language : navigator.language,
-		failbackLanguage : 'en',
-		basePath : 'src'
+		failbackLanguage : "en",
+		basePath : "src"
 	}, options);
 
 	/** @member {Element} inputElement - Dom element used as input, generally a span element. */
@@ -50,7 +50,7 @@ var ShellUI = function(inputElement, outputElement, options) {
 	this.eventListeners = {};
 	
 	// Init the shell UI when Dom is ready.
-	if( document.readyState === 'complete' ) {
+	if( document.readyState === "complete" ) {
 		this.init();
 	}else{
 		document.addEventListener("DOMContentLoaded", this.init.bind(this));
@@ -74,50 +74,50 @@ ShellUI.prototype.controlPressed = false;
  */
 ShellUI.prototype.init = function() {
 	// Input Element
-	if (typeof this.inputElement === 'string') {
+	if (typeof this.inputElement === "string") {
 		this.inputElement = document.getElementById(this.inputElement);
 	}
-	this.inputElement.style['white-space'] = 'pre';
+	this.inputElement.style['white-space'] = "pre";
 		
 	// Output element
-	if (typeof this.outputElement === 'string') {
+	if (typeof this.outputElement === "string") {
 		this.outputElement = document.getElementById(this.outputElement);
 	}
-	this.outputElement.style['white-space'] = 'pre';
+	this.outputElement.style['white-space'] = "pre";
 		
 	// endline Element
-	this.endlineElement = this.createElement('span', ' ');
+	this.endlineElement = this.createElement("span", " ");
 	this.endlineElement.style['background-color'] = this.options.highlightColor;
-	this.endlineElement.style['white-space'] = 'pre';
-	this.endlineElement.style['padding-left'] = '3px';
+	this.endlineElement.style['white-space'] = "pre";
+	this.endlineElement.style['padding-left'] = "3px";
 	this.inputElement.parentElement.insertBefore(this.endlineElement, this.inputElement.nextSibling);
 	
 	// Prefix Element
-	this.prefixElement = this.createElement('span', this.options.prefix+' ');
+	this.prefixElement = this.createElement("span", this.options.prefix+" ");
 	this.inputElement.parentElement.insertBefore(this.prefixElement, this.inputElement);
 	
 	// Drag Drop events
 	document.addEventListener("dragover", function( event ) {
      		event.preventDefault();
- 	}, false);
+    }, false);
  	document.addEventListener("drop", this.dropText.bind(this));
 	document.addEventListener("paste", this.pasteText.bind(this));
 
 	// Keyboard events
-	document.addEventListener('keypress', this.keyboardCallback.bind(this));
-	document.addEventListener('keydown', this.keyboardInteraction.bind(this));
-	document.addEventListener('keyup', this.keyboardUp.bind(this));
+	document.addEventListener("keypress", this.keyboardCallback.bind(this));
+	document.addEventListener("keydown", this.keyboardInteraction.bind(this));
+	document.addEventListener("keyup", this.keyboardUp.bind(this));
 		
 	// Internal events
-	this.addEventListener('commandComplete', this.commandComplete.bind(this));
+	this.addEventListener("commandComplete", this.commandComplete.bind(this));
 	if(this.options.helpEnabled === true){
-		this.addCommand('help', this.helpCommand.bind(this));
+		this.addCommand("help", this.helpCommand.bind(this));
 	}
 		
 	// Load language files
-	this.loadDependancy(this.options.basePath+"/languages/"+this.options.language+'.js');
+	this.loadDependancy(this.options.basePath+"/languages/"+this.options.language+".js");
 	if(this.options.language !== this.options.failbackLanguage){
-		this.loadDependancy(this.options.basePath+"/languages/"+this.options.failbackLanguage+'.js');
+		this.loadDependancy(this.options.basePath+"/languages/"+this.options.failbackLanguage+".js");
 	}
 };
 
@@ -141,16 +141,16 @@ ShellUI.prototype.loadDependancy = function(file) {
 ShellUI.prototype.helpCommand = function(command) {
 	var helpText = '';
 	if(command === undefined){
-		helpText = this.getMessage('command_list_title')+'\r\n\r\n';
+		helpText = this.getMessage('command_list_title')+"\r\n\r\n";
 		for (var prop in this.commands) {
-			if(prop !== 'help'){					
-				helpText += ' - '+this.commands[prop].getHelp(true)+'\r\n';
+			if(prop !== "help"){					
+				helpText += ' - '+this.commands[prop].getHelp(true)+"\r\n";
 			}
 		}
-		helpText += '\r\n '+this.getMessage('command_help');
+		helpText += "\r\n "+this.getMessage("command_help");
 	}else if(command){
 		if(this.getCommand(command) === null){
-			helpText += this.getMessage('command_not_found').printf(command);
+			helpText += this.getMessage("command_not_found").printf(command);
 		}else{
 			helpText += this.commands[command].getHelp();	
 		}		
@@ -212,9 +212,9 @@ ShellUI.prototype.executeCommand = function(command){
 	var parser = new ShellUICommandParser(command);
 	var commandInstance = this.getCommand(parser.command);
 	if(commandInstance === null){
-	 	this.printOutput(this.getMessage('command_not_found').printf(parser.command));
+	 	this.printOutput(this.getMessage("command_not_found").printf(parser.command));
 	}else{
-		this.prefixElement.style.display = 'none';
+		this.prefixElement.style.display = "none";
 		commandInstance.execute(parser.getArguments());
 	}
 };
@@ -231,7 +231,7 @@ ShellUI.prototype.repeatCommand = function(index){
 		var i;
 		var l = this.commandHistory[this.currentHistory].length;
 		for(i=0;i<l;i++){				
-			this.inputElement.appendChild(this.createElement('span', this.commandHistory[this.currentHistory][i]));
+			this.inputElement.appendChild(this.createElement("span", this.commandHistory[this.currentHistory][i]));
 		}
 	}
 };
@@ -246,7 +246,7 @@ ShellUI.prototype.commandComplete = function(e){
 		this.printOutput(e.options.returnContent);
 	}
 	this.resetInput();
-	this.prefixElement.style.display = 'inline';
+	this.prefixElement.style.display = "inline";
 };
 
 /**
@@ -337,14 +337,14 @@ ShellUI.prototype.removeChar = function (index){
  */
 ShellUI.prototype.selectChar = function(index) {
 	if(this.keyboardSelected !== null && this.inputElement.children[this.keyboardSelected]) {
-		this.inputElement.children[this.keyboardSelected].style['background-color'] = 'transparent';
+		this.inputElement.children[this.keyboardSelected].style["background-color"] = "transparent";
 	}
 	this.keyboardSelected = index;
 	if(this.keyboardSelected !== null && this.inputElement.children[this.keyboardSelected]) {			
-		this.endlineElement.style.display = 'none';			
-		this.inputElement.children[this.keyboardSelected].style['background-color'] = this.options.highlightColor;
+		this.endlineElement.style.display = "none";			
+		this.inputElement.children[this.keyboardSelected].style["background-color"] = this.options.highlightColor;
 	} else {
-		this.endlineElement.style.display='inline';
+		this.endlineElement.style.display = "inline";
 	}
 };
 	
@@ -362,7 +362,7 @@ ShellUI.prototype.selectFromKeyboard = function(direction) {
 			} else if(this.keyboardSelected > 0) {
 				this.selectChar(this.keyboardSelected-1);
 			}
-		} else if(direction === 'right') {
+		} else if(direction === "right") {
 			if(this.keyboardSelected !== null && this.keyboardSelected < length-1) {
 				this.selectChar(this.keyboardSelected+1);
 			}else{
@@ -380,13 +380,13 @@ ShellUI.prototype.selectFromKeyboard = function(direction) {
 ShellUI.prototype.selectCommandFromHistory = function(direction) {
 	length = this.commandHistory.length;
 	if(length > 0) {
-		if(direction === 'top') {
+		if(direction === "top") {
 			if(this.currentHistory === null) {
 				this.repeatCommand(length-1);
 			} else if(this.currentHistory > 0) {
 				this.repeatCommand(this.currentHistory-1);
 			}
-		} else if(direction === 'bottom') {
+		} else if(direction === "bottom") {
 			 if(this.currentHistory !== null && this.currentHistory < length-1) {
 				this.repeatCommand(this.currentHistory+1);
 			} else {
@@ -435,15 +435,15 @@ ShellUI.prototype.keyboardCallback = function(e) {
 		    if(this.preventPaste === false) {
 		    	if(this.controlPressed === true && (e.key === 'c' || e.keyCode === 3)) {
 		    		this.resetInput();
-		    		var ev = new ShellUIEvent('cancel', {});
+		    		var ev = new ShellUIEvent("cancel", {});
 					this.dispatchEvent(ev);		    			
 		    		return;
 		    	}
 		    	if(this.keyboardSelected !== null) {						
-					this.inputElement.insertBefore(this.createElement('span',e.key), this.inputElement.children[this.keyboardSelected]);
+					this.inputElement.insertBefore(this.createElement("span", e.key), this.inputElement.children[this.keyboardSelected]);
 					this.selectChar(this.keyboardSelected+1);					  
 				} else {
-					this.inputElement.append(this.createElement('span',e.key));
+					this.inputElement.append(this.createElement("span", e.key));
 				}
 		}
 	}
@@ -455,11 +455,11 @@ ShellUI.prototype.keyboardCallback = function(e) {
  * @param {KeyboardEvent} e - KeyboardEvent.
  */
 ShellUI.prototype.keyboardUp = function(e) {
-	if(e.keyIdentifier == 'Control' || e.key === 'Control') {
+	if(e.keyIdentifier == "Control" || e.key === "Control") {
 		this.controlPressed = false;
 		return;
 	}
-	if((e.keyIdentifier && e.keyIdentifier === 'Meta') || (e.key && e.key === 'Meta')) {
+	if((e.keyIdentifier && e.keyIdentifier === "Meta") || (e.key && e.key === "Meta")) {
 		this.preventPaste = false;
 		return;
 	}
@@ -491,16 +491,16 @@ ShellUI.prototype.keyboardInteraction = function(e) {
 			}
        		break;        	
        	case 37:
-       		this.selectFromKeyboard('left');
+       		this.selectFromKeyboard("left");
        		break;
        	case 39:
-       		this.selectFromKeyboard('right');
+       		this.selectFromKeyboard("right");
        		break;
        	case 38:
-       		this.selectCommandFromHistory('top');
+       		this.selectCommandFromHistory("top");
        		break;
        	case 40:
-       		this.selectCommandFromHistory('bottom');
+       		this.selectCommandFromHistory("bottom");
        		break;
 	    default:
 	}
@@ -546,7 +546,7 @@ ShellUI.prototype.pasteText = function(e) {
 	var i;
 	var txl = tx.length;
 	for(i=0;i<txl;i++) {
-		ptp += '<span>'+tx[i]+'</span>';
+		ptp += "<span>"+tx[i]+"</span>";
 	}
 	if(this.keyboardSelected !== null) {	
 		var newContent = '';
@@ -555,7 +555,7 @@ ShellUI.prototype.pasteText = function(e) {
 			if(i === this.keyboardSelected) {
 				newContent += ptp;
 			}
-			newContent += '<span>'+ptx[i]+'</span>';
+			newContent += "<span>"+ptx[i]+"</span>";
 		}
 		this.inputElement.innerHTML = newContent;
 		this.keyboardSelected = this.keyboardSelected+textData.length;	  
