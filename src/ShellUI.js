@@ -139,12 +139,12 @@ ShellUI.prototype.loadDependancy = function(file) {
  * @return {string} Help text.
  */
 ShellUI.prototype.helpCommand = function(command) {
-	var helpText = '';
+	var helpText = "";
 	if(command === undefined){
-		helpText = this.getMessage('command_list_title')+"\r\n\r\n";
+		helpText = this.getMessage("command_list_title")+"\r\n\r\n";
 		for (var prop in this.commands) {
 			if(prop !== "help"){					
-				helpText += ' - '+this.commands[prop].getHelp(true)+"\r\n";
+				helpText += " - "+this.commands[prop].getHelp(true)+"\r\n";
 			}
 		}
 		helpText += "\r\n "+this.getMessage("command_help");

@@ -118,7 +118,7 @@ ShellUICommand.prototype.getHelp = function(summary){
 ShellUICommand.prototype.getArguments=function(){
 	if(!this.arguments){
 		this.arguments = [];
-		var args = this.callback.toString ().replace (/[\r\n\s]+/g, ' ').match (/function\s*\w*\s*\((.*?)\)/)[1].split (/\s*,\s*/);
+		var args = this.callback.toString ().replace (/[\r\n\s]+/g, " ").match (/function\s*\w*\s*\((.*?)\)/)[1].split (/\s*,\s*/);
         var i;
         var l = args.length;
         for(i=0;i<l;i++){
