@@ -56,9 +56,9 @@ ShellUICommand.prototype.execute = function(args) {
  * 
  * @param {string} returnContent - content returned.
  */
-ShellUICommand.prototype.endCommand=function(returnContent) {
+ShellUICommand.prototype.endCommand=function(content) {
 	if(this.cancel === false) {
-		var event = new ShellUIEvent("commandComplete", {returnContent:returnContent, command:this});
+		var event = new ShellUIEvent("commandComplete", {returnContent:content, command:this});
 		this.shell.dispatchEvent(event);
 	}
 };

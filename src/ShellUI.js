@@ -59,8 +59,9 @@ var ShellUI = function(inputElement, outputElement, options) {
 	if(this.options.helpEnabled === true){
 		this.addCommand("help", this.helpCommand.bind(this));
 	}
-	
 };
+
+var ShellUILanguage = {};
 
 /** @member {Number} Index of the current selected character.*/
 ShellUI.prototype.keyboardSelected = null;
@@ -82,7 +83,7 @@ ShellUI.prototype.init = function() {
 	if (typeof this.inputElement === "string") {
 		this.inputElement = document.getElementById(this.inputElement);
 	}
-	this.inputElement.style['white-space'] = "pre";
+	this.inputElement.style["white-space"] = "pre";
 		
 	// Output element
 	if (typeof this.outputElement === "string") {
@@ -354,45 +355,39 @@ ShellUI.prototype.selectChar = function(index) {
  * @param {string} direction - Direction of the selection 'left' or 'right'.
  */
 ShellUI.prototype.selectFromKeyboard = function(direction) {
-	length = this.inputElement.children.length;
-	if(length > 0) {
-		if(direction === "left") {
-			if(this.keyboardSelected === null) {
-				this.selectChar(length-1);
-			} else if(this.keyboardSelected > 0) {
-				this.selectChar(this.keyboardSelected-1);
-			}
-		} else if(direction === "right") {
-			if(this.keyboardSelected !== null && this.keyboardSelected < length-1) {
-				this.selectChar(this.keyboardSelected+1);
-			}else{
-				this.selectChar(null);					
-			}
-		}
-   	}	
+	this.iterateSelector(this.inputElement.children.length, 
+		this.keyboardSelected,
+		this.selectChar,
+		direction);
 };
-	
+
 /**
  * Detect the next command to get from history with top and bottom arrow.
  * 
  * @param {string} direction - Direction of the history selection 'top' or 'bottom'.
  */
 ShellUI.prototype.selectCommandFromHistory = function(direction) {
-	length = this.commandHistory.length;
+	this.iterateSelector(this.commandHistory.length, 
+		this.currentHistory,
+		this.repeatCommand,
+		direction);
+};
+
+ShellUI.prototype.iterateSelector = function(length, index, func, direction) {
 	if(length > 0) {
-		if(direction === "top") {
-			if(this.currentHistory === null) {
-				this.repeatCommand(length-1);
-			} else if(this.currentHistory > 0) {
-				this.repeatCommand(this.currentHistory-1);
+		if(direction === "left" || direction === "top" ) {
+			if(index === null) {
+				func.apply(this, [(length-1)]);
+			} else if(index > 0) {
+				func.apply(this, [(index-1)]);
 			}
-		} else if(direction === "bottom") {
-			 if(this.currentHistory !== null && this.currentHistory < length-1) {
-				this.repeatCommand(this.currentHistory+1);
-			} else {
-				this.repeatCommand(null);					
+		} else if(direction === "right" || direction === "bottom"){
+			if(index !== null && index < length-1) {
+				func.apply(this, [(index+1)]);
+			}else{
+				func.apply(this, [null]);				
 			}
-		}				
+		}
 	}
 };
 
@@ -582,7 +577,6 @@ ShellUI.prototype.createElement = function(type, text){
 	return ne;
 };
 
-var ShellUILanguage = {};
 String.prototype.printf = function () {
 	var args = arguments;
   	var i=0;
