@@ -15,7 +15,7 @@
  */
 var ShellUICommand = function(name, callback, options, shell) {
 	
-	if(options === undefined) {
+	if(!options) {
 		options = {};
 	}
 	/** @member {string} Command name.*/
@@ -83,9 +83,9 @@ ShellUICommand.prototype.getSignature = function() {
 		var args=this.getArguments();
 		var i;
 		var l = args.length;
-        for(i=0;i<l;i++) {
-   	    	this.signature += " ["+args[i]+"]";
-        }
+		for(i=0;i<l;i++) {
+			this.signature += " ["+args[i]+"]";
+		}
 	}
 	return this.signature;
 };

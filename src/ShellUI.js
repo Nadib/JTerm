@@ -28,7 +28,7 @@ var ShellUI = function(inputElement, outputElement, options) {
 		prefix : "$",
 		highlightColor : "#a5a5a5",
 		helpEnabled : true,
-		language : navigator.language,
+		language : navigator.language.split('-')[0],
 		failbackLanguage : "en",
 		basePath : "src"
 	}, options);
@@ -166,7 +166,7 @@ ShellUI.prototype.helpCommand = function(command) {
  * @return {string} The message.
  */
 ShellUI.prototype.getMessage = function(message, language) {		
-	if(language === undefined){
+	if(!language){
 		language = this.options.language;
 	}
 	if(ShellUILanguage[language][message]){
@@ -212,7 +212,7 @@ ShellUI.prototype.executeCommand = function(command){
 	var commandInstance = this.getCommand(parser.command);
 	if(commandInstance === null){
 		var message = new ShellUIMessage(this, "commandNotFound");
-	 	this.printOutput(message.printf(parser.command));
+		this.printOutput(message.printf(parser.command));
 	}else{
 		this.prefixElement.style.display = "none";
 		commandInstance.execute(parser.getArguments());
@@ -397,15 +397,15 @@ ShellUI.prototype.iterateSelector = function(length, index, func, direction) {
  */
 ShellUI.prototype.keyboardCallback = function(e) {
 	switch (e.keyCode) {
-    	case 8:
-       	case 37:
-       	case 39:
-       	case 38:
-       	case 40:
-       		break;
-       	case 13:
-       		// Enter -> Command execution
-       		var cmd = this.inputElement.textContent;
+		case 8:
+    	case 37:
+		case 39:
+		case 38:
+		case 40:
+			break;
+		case 13:
+			// Enter -> Command execution
+			var cmd = this.inputElement.textContent;
 			this.printOutput(this.prefixElement.textContent+cmd);
 			this.resetInput();
 			if(cmd) {
@@ -414,25 +414,25 @@ ShellUI.prototype.keyboardCallback = function(e) {
 			}
 			this.outputElement.parentNode.scrollTop = this.outputElement.parentNode.scrollHeight;
 			this.currentHistory=null;
-        	break;
+			break;
 		default:
 			if(!e.key) {
-	    		var dec = String.fromCharCode(e.keyCode);
+				var dec = String.fromCharCode(e.keyCode);
 				if(!e.shiftKey) {
 					dec = dec.toLowerCase();
 				}
 				e.key = dec;
-		    }		    	
-		    if(this.preventPaste === false) {
-		    	// CTRL+C Command cancel
-		    	if(this.controlPressed === true && (e.key === 'c' || e.keyCode === 3)) {
-		    		this.resetInput();
-		    		var ev = new ShellUIEvent("cancel", {});
-					this.dispatchEvent(ev);		    			
-		    		return;
+			}
+			if(this.preventPaste === false) {
+				// CTRL+C Command cancel
+				if(this.controlPressed === true && (e.key === 'c' || e.keyCode === 3)) {
+					this.resetInput();
+					var ev = new ShellUIEvent("cancel", {});
+					this.dispatchEvent(ev);
+					return;
 		    	}
-		    	// Normal text typing
-		    	if(this.keyboardSelected !== null) {						
+				// Normal text typing
+				if(this.keyboardSelected !== null) {						
 					this.inputElement.insertBefore(this.createElement("span", e.key), this.inputElement.children[this.keyboardSelected]);
 					this.selectChar(this.keyboardSelected+1);					  
 				} else {
@@ -448,15 +448,11 @@ ShellUI.prototype.keyboardCallback = function(e) {
  * @param {KeyboardEvent} e - KeyboardEvent.
  */
 ShellUI.prototype.keyboardUp = function(e) {
-	// Press "control"
-	if(e.keyIdentifier === "Control" || e.key === "Control") {
+	var identifier = e.keyIdentifier || e.key;
+	if(identifier === "Control") {
 		this.controlPressed = false;
-		return;
-	}
-	// Meta Press
-	if(e.keyIdentifier === "Meta" || e.key === "Meta") {
+	}else if(identifier === "Meta") {
 		this.preventPaste = false;
-		return;
 	}
 };
 	
@@ -466,14 +462,14 @@ ShellUI.prototype.keyboardUp = function(e) {
  * @param {KeyboardEvent} e - The dispatched keyboard event.
  */
 ShellUI.prototype.keyboardInteraction = function(e) {
-	if(e.keyIdentifier === "Meta" || e.key === "Meta") {
-		this.preventPaste = true;
-		return;
-	}
-	if(e.keyIdentifier === "Control" || e.key === "Control") {
+	
+	var identifier = e.keyIdentifier || e.key;
+	if(identifier === "Control") {
 		this.controlPressed = true;
-		return;
+	}else if(identifier === "Meta") {
+		this.preventPaste = true;
 	}
+	
 	switch (e.keyCode) {
 		case 8:
         	if(this.keyboardSelected !== null) {
