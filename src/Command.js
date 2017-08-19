@@ -13,7 +13,6 @@
  * @license Apache-2.0
  * @author Nadib Bandi
  */
-"use strict";
 var ShellUICommand = function(name, callback, options, shell) {
 	
 	if(options === undefined) {

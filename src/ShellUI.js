@@ -21,7 +21,6 @@
  * @license Apache-2.0
  * @author Nadib Bandi
  */
-"use strict";
 var ShellUI = function(inputElement, outputElement, options) {
 	
 	/** @member {Object} options - ShellUI options.*/
@@ -60,8 +59,6 @@ var ShellUI = function(inputElement, outputElement, options) {
 		this.addCommand("help", this.helpCommand.bind(this));
 	}
 };
-
-var ShellUILanguage = {};
 
 /** @member {Number} Index of the current selected character.*/
 ShellUI.prototype.keyboardSelected = null;
@@ -151,10 +148,11 @@ ShellUI.prototype.helpCommand = function(command) {
 		helpText += "\r\n "+this.getMessage("commandHelp");
 	}else if(command){
 		if(this.getCommand(command) === null){
-			helpText += this.getMessage("commandNotFound").printf(command);
+			var message = new ShellUIMessage(this, "commandNotFound");
+			helpText += message.printf(command);
 		}else{
 			helpText += this.commands[command].getHelp();	
-		}		
+		}
 	}
 	return helpText;
 };
@@ -192,7 +190,7 @@ ShellUI.prototype.addCommand = function(name, callback, options) {
 };
 
 /**
- * Get a comand instance.
+ * Get a command instance.
  * 
  * @param {string} name - Command name.
  * @return {ShellUICommand|null} The command instance or null if not exists.
@@ -213,7 +211,8 @@ ShellUI.prototype.executeCommand = function(command){
 	var parser = new ShellUICommandParser(command);
 	var commandInstance = this.getCommand(parser.command);
 	if(commandInstance === null){
-	 	this.printOutput(this.getMessage("commandNotFound").printf(parser.command));
+		var message = new ShellUIMessage(this, "commandNotFound");
+	 	this.printOutput(message.printf(parser.command));
 	}else{
 		this.prefixElement.style.display = "none";
 		commandInstance.execute(parser.getArguments());
@@ -576,12 +575,4 @@ ShellUI.prototype.createElement = function(type, text){
 	var tn = document.createTextNode(text);
 	ne.appendChild(tn);
 	return ne;
-};
-
-String.prototype.printf = function () {
-	var args = arguments;
-  	var i=0;
-  	return this.replace(/(%s)/g, function () {
-    return args[i++];
-  });
 };

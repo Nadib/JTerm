@@ -8,7 +8,6 @@
  * @license Apache-2.0
  * @author Nadib Bandi
  */
-"use strict";
 var ShellUIEvent = function(name, options) {
 	/** @member {string} name - Event name */
 	this.name = name;
