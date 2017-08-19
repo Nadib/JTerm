@@ -104,7 +104,7 @@ ShellUI.prototype.init = function() {
 	
 	// Drag Drop events
 	document.addEventListener("dragover", this.dragOver.bind(this), false);
- 	document.addEventListener("drop", this.dropText.bind(this));
+	document.addEventListener("drop", this.dropText.bind(this));
 	document.addEventListener("paste", this.pasteText.bind(this));
 
 	// Keyboard events
@@ -177,7 +177,7 @@ ShellUI.prototype.getMessage = function(message, language) {
 	if(ShellUILanguage[this.options.failbackLanguage][message]){
 		return ShellUILanguage[this.options.failbackLanguage][message];
 	}	
-	return undefined;
+	return null;
 };
 
 /**
