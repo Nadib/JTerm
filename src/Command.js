@@ -140,16 +140,14 @@ var ShellUICommandParser = function(command) {
 	var i=1;
 	var l = cd.length;
 	for(i=1;i<l;i++) {
-		if(cd[i][0] === '"' && cd[i][(cd[i].length-1)] === '"') {
-			cd[i] = cd[i].substr(1);
-			cd[i] = cd[i].substr( 0, cd[i].length-1);
-		}else if(cd[i][0] === "'" && cd[i][(cd[i].length-1)] === "'") {
+		if((cd[i][0] === '"' && cd[i][(cd[i].length-1)] === '"') || (cd[i][0] === "'" && cd[i][(cd[i].length-1)] === "'")) {
 			cd[i] = cd[i].substr(1);
 			cd[i] = cd[i].substr( 0, cd[i].length-1);
 		}
 		this.arguments.push(cd[i]);
 	}
 };
+
 
 /**
  * Get parsed arcguments.

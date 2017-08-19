@@ -399,16 +399,13 @@ ShellUI.prototype.iterateSelector = function(length, index, func, direction) {
 ShellUI.prototype.keyboardCallback = function(e) {
 	switch (e.keyCode) {
     	case 8:
-       		break;        	
        	case 37:
-       		break;
        	case 39:
-       		break;
        	case 38:
-       		break;
        	case 40:
        		break;
        	case 13:
+       		// Enter -> Command execution
        		var cmd = this.inputElement.textContent;
 			this.printOutput(this.prefixElement.textContent+cmd);
 			this.resetInput();
@@ -428,12 +425,14 @@ ShellUI.prototype.keyboardCallback = function(e) {
 				e.key = dec;
 		    }		    	
 		    if(this.preventPaste === false) {
+		    	// CTRL+C Command cancel
 		    	if(this.controlPressed === true && (e.key === 'c' || e.keyCode === 3)) {
 		    		this.resetInput();
 		    		var ev = new ShellUIEvent("cancel", {});
 					this.dispatchEvent(ev);		    			
 		    		return;
 		    	}
+		    	// Normal text typing
 		    	if(this.keyboardSelected !== null) {						
 					this.inputElement.insertBefore(this.createElement("span", e.key), this.inputElement.children[this.keyboardSelected]);
 					this.selectChar(this.keyboardSelected+1);					  
@@ -450,11 +449,13 @@ ShellUI.prototype.keyboardCallback = function(e) {
  * @param {KeyboardEvent} e - KeyboardEvent.
  */
 ShellUI.prototype.keyboardUp = function(e) {
-	if(e.keyIdentifier == "Control" || e.key === "Control") {
+	// Press "control"
+	if(e.keyIdentifier === "Control" || e.key === "Control") {
 		this.controlPressed = false;
 		return;
 	}
-	if((e.keyIdentifier && e.keyIdentifier === "Meta") || (e.key && e.key === "Meta")) {
+	// Meta Press
+	if(e.keyIdentifier === "Meta" || e.key === "Meta") {
 		this.preventPaste = false;
 		return;
 	}
@@ -470,7 +471,7 @@ ShellUI.prototype.keyboardInteraction = function(e) {
 		this.preventPaste = true;
 		return;
 	}
-	if(e.keyIdentifier == "Control" || e.key === "Control") {
+	if(e.keyIdentifier === "Control" || e.key === "Control") {
 		this.controlPressed = true;
 		return;
 	}
@@ -502,7 +503,7 @@ ShellUI.prototype.keyboardInteraction = function(e) {
 };
 
 ShellUI.prototype.dragOver = function(e) {
-	e.preventDefault;
+	e.preventDefault();
 };
 
 /**
