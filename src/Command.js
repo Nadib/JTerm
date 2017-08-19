@@ -16,7 +16,7 @@
 "use strict";
 var ShellUICommand = function(name, callback, options, shell) {
 	
-	if(options === undefined){
+	if(options === undefined) {
 		options = {};
 	}
 	/** @member {string} Command name.*/
@@ -42,11 +42,11 @@ ShellUICommand.prototype.cancel = false;
  */
 ShellUICommand.prototype.execute = function(args) {
 	this.cancel = false;
-	this.shell.removeEventListener('cancel', this.cancelBound);
-	this.shell.addEventListener('cancel', this.cancelBound);
-	if(this.options.async === true){
+	this.shell.removeEventListener("cancel", this.cancelBound);
+	this.shell.addEventListener("cancel", this.cancelBound);
+	if(this.options.async === true) {
 		this.callback.apply(this, args);
-	}else{
+	} else {
 		this.endCommand(this.callback.apply(this, args));
 	}
 };
@@ -56,9 +56,9 @@ ShellUICommand.prototype.execute = function(args) {
  * 
  * @param {string} returnContent - content returned.
  */
-ShellUICommand.prototype.endCommand=function(returnContent){
-	if(this.cancel === false){
-		var event = new ShellUIEvent('commandComplete', {returnContent:returnContent, command:this});
+ShellUICommand.prototype.endCommand=function(returnContent) {
+	if(this.cancel === false) {
+		var event = new ShellUIEvent("commandComplete", {returnContent:returnContent, command:this});
 		this.shell.dispatchEvent(event);
 	}
 };
@@ -68,9 +68,9 @@ ShellUICommand.prototype.endCommand=function(returnContent){
  * 
  * @param {ShellUIEvent} e - ShellUI event cancel.
  */
-ShellUICommand.prototype.cancelCallback = function(e){
+ShellUICommand.prototype.cancelCallback = function(e) {
 	this.cancel = true;
-	var event = new ShellUIEvent('commandComplete', {returnContent:undefined, command:this});
+	var event = new ShellUIEvent("commandComplete", {returnContent:undefined, command:this});
 	this.shell.dispatchEvent(event);
 };
 
@@ -78,14 +78,14 @@ ShellUICommand.prototype.cancelCallback = function(e){
  * Get the command signature.
  * @return {string}
  */
-ShellUICommand.prototype.getSignature = function(){
-	if(!this.signature){
+ShellUICommand.prototype.getSignature = function() {
+	if(!this.signature) {
 		this.signature = this.name;
 		var args=this.getArguments();
 		var i;
 		var l = args.length;
-        for(i=0;i<l;i++){
-   	    	this.signature += ' ['+args[i]+']';
+        for(i=0;i<l;i++) {
+   	    	this.signature += " ["+args[i]+"]";
         }
 	}
 	return this.signature;
@@ -98,15 +98,15 @@ ShellUICommand.prototype.getSignature = function(){
  * 
  * @return {string} The help text.
  */
-ShellUICommand.prototype.getHelp = function(summary){
+ShellUICommand.prototype.getHelp = function(summary) {
 	var helpText = this.getSignature();
-	if(this.options.summary){
-		helpText += ' '+this.options.summary;
+	if(this.options.summary) {
+		helpText += " "+this.options.summary;
 	}
-	if(summary === true){
+	if(summary === true) {
 		return helpText;
 	}
-	if(this.options.help){
+	if(this.options.help) {
 		helpText += " \r\n"+this.options.help;
 	}
 	return helpText;
@@ -115,14 +115,14 @@ ShellUICommand.prototype.getHelp = function(summary){
 /**
  * Get arguments list.
  */
-ShellUICommand.prototype.getArguments=function(){
-	if(!this.arguments){
+ShellUICommand.prototype.getArguments=function() {
+	if(!this.arguments) {
 		this.arguments = [];
 		var args = this.callback.toString ().replace (/[\r\n\s]+/g, " ").match (/function\s*\w*\s*\((.*?)\)/)[1].split (/\s*,\s*/);
         var i;
         var l = args.length;
-        for(i=0;i<l;i++){
-        	this.arguments.push(' ['+args[i]+']');
+        for(i=0;i<l;i++) {
+        	this.arguments.push(args[i]);
         }
 	}
 	return this.arguments;
@@ -133,17 +133,17 @@ ShellUICommand.prototype.getArguments=function(){
  * 
  * @param {string} command Command as string
  */
-var ShellUICommandParser = function(command){
+var ShellUICommandParser = function(command) {
 	var cd = command.match(/'[^']*'|"[^"]*"|\S+/g) || [];
 	this.command = cd[0];
 	this.arguments=[];
 	var i=1;
 	var l = cd.length;
-	for(i=1;i<l;i++){
-		if(cd[i][0] === '"' && cd[i][(cd[i].length-1)] === '"'){
+	for(i=1;i<l;i++) {
+		if(cd[i][0] === '"' && cd[i][(cd[i].length-1)] === '"') {
 			cd[i] = cd[i].substr(1);
 			cd[i] = cd[i].substr( 0, cd[i].length-1);
-		}else if(cd[i][0] === "'" && cd[i][(cd[i].length-1)] === "'"){
+		}else if(cd[i][0] === "'" && cd[i][(cd[i].length-1)] === "'") {
 			cd[i] = cd[i].substr(1);
 			cd[i] = cd[i].substr( 0, cd[i].length-1);
 		}
@@ -155,6 +155,6 @@ var ShellUICommandParser = function(command){
  * Get parsed arcguments.
  * @return {Array}
  */
-ShellUICommandParser.prototype.getArguments = function(){
+ShellUICommandParser.prototype.getArguments = function() {
 	return this.arguments;
 };

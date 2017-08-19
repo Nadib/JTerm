@@ -18,10 +18,7 @@ body {
 	text-align:left;
 	padding:5px;
 	width:60%;
-	margin-right: auto; 
-	margin-left: auto;
+	margin auto;
 	height:500px;
-	margin-top:auto;
-	margin-bottom:auto;
 	overflow-y:scroll;
 }

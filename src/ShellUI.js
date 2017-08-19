@@ -2,8 +2,8 @@
  * Shell UI object constructor.
  * @constructor
  * @classdesc Shell UI class.
- * @param {string} inputElement - The dom id of the input element generally a span.
- * @param {string} outputElement - The dom id of the shell output element generally a div.
+ * @param {string|Element} inputElement - The dom id or Element of the input element generally a span.
+ * @param {string|Element} outputElement - The dom id or Element of the shell output element generally a div.
  * @param {object} options - Options object.
  * 
  * Available options :
@@ -55,6 +55,11 @@ var ShellUI = function(inputElement, outputElement, options) {
 	}else{
 		document.addEventListener("DOMContentLoaded", this.init.bind(this));
 	}
+	// Enable help
+	if(this.options.helpEnabled === true){
+		this.addCommand("help", this.helpCommand.bind(this));
+	}
+	
 };
 
 /** @member {Number} Index of the current selected character.*/
@@ -83,13 +88,13 @@ ShellUI.prototype.init = function() {
 	if (typeof this.outputElement === "string") {
 		this.outputElement = document.getElementById(this.outputElement);
 	}
-	this.outputElement.style['white-space'] = "pre";
+	this.outputElement.style["white-space"] = "pre";
 		
 	// endline Element
 	this.endlineElement = this.createElement("span", " ");
-	this.endlineElement.style['background-color'] = this.options.highlightColor;
-	this.endlineElement.style['white-space'] = "pre";
-	this.endlineElement.style['padding-left'] = "3px";
+	this.endlineElement.style["background-color"] = this.options.highlightColor;
+	this.endlineElement.style["white-space"] = "pre";
+	this.endlineElement.style["padding-left"] = "3px";
 	this.inputElement.parentElement.insertBefore(this.endlineElement, this.inputElement.nextSibling);
 	
 	// Prefix Element
@@ -97,9 +102,7 @@ ShellUI.prototype.init = function() {
 	this.inputElement.parentElement.insertBefore(this.prefixElement, this.inputElement);
 	
 	// Drag Drop events
-	document.addEventListener("dragover", function( event ) {
-     		event.preventDefault();
-    }, false);
+	document.addEventListener("dragover", this.dragOver.bind(this), false);
  	document.addEventListener("drop", this.dropText.bind(this));
 	document.addEventListener("paste", this.pasteText.bind(this));
 
@@ -110,9 +113,6 @@ ShellUI.prototype.init = function() {
 		
 	// Internal events
 	this.addEventListener("commandComplete", this.commandComplete.bind(this));
-	if(this.options.helpEnabled === true){
-		this.addCommand("help", this.helpCommand.bind(this));
-	}
 		
 	// Load language files
 	this.loadDependancy(this.options.basePath+"/languages/"+this.options.language+".js");
@@ -141,16 +141,16 @@ ShellUI.prototype.loadDependancy = function(file) {
 ShellUI.prototype.helpCommand = function(command) {
 	var helpText = "";
 	if(command === undefined){
-		helpText = this.getMessage("command_list_title")+"\r\n\r\n";
+		helpText = this.getMessage("commandListTitle")+"\r\n\r\n";
 		for (var prop in this.commands) {
 			if(prop !== "help"){					
 				helpText += " - "+this.commands[prop].getHelp(true)+"\r\n";
 			}
 		}
-		helpText += "\r\n "+this.getMessage("command_help");
+		helpText += "\r\n "+this.getMessage("commandHelp");
 	}else if(command){
 		if(this.getCommand(command) === null){
-			helpText += this.getMessage("command_not_found").printf(command);
+			helpText += this.getMessage("commandNotFound").printf(command);
 		}else{
 			helpText += this.commands[command].getHelp();	
 		}		
@@ -170,10 +170,10 @@ ShellUI.prototype.getMessage = function(message, language) {
 	if(language === undefined){
 		language = this.options.language;
 	}
-	if(ShellUILanguage[language] && ShellUILanguage[language][message]){
+	if(ShellUILanguage[language][message]){
 		return ShellUILanguage[language][message];
 	}
-	if(ShellUILanguage[this.options.failbackLanguage] && ShellUILanguage[this.options.failbackLanguage][message]){
+	if(ShellUILanguage[this.options.failbackLanguage][message]){
 		return ShellUILanguage[this.options.failbackLanguage][message];
 	}	
 	return undefined;
@@ -212,7 +212,7 @@ ShellUI.prototype.executeCommand = function(command){
 	var parser = new ShellUICommandParser(command);
 	var commandInstance = this.getCommand(parser.command);
 	if(commandInstance === null){
-	 	this.printOutput(this.getMessage("command_not_found").printf(parser.command));
+	 	this.printOutput(this.getMessage("commandNotFound").printf(parser.command));
 	}else{
 		this.prefixElement.style.display = "none";
 		commandInstance.execute(parser.getArguments());
@@ -313,7 +313,7 @@ ShellUI.prototype.resetInput = function(){
  * @param {string} text - The text to print in the output container
  */
 ShellUI.prototype.printOutput = function(text){
-	this.outputElement.appendChild(this.createElement('p',text));
+	this.outputElement.appendChild(this.createElement("p", text));
 };
 	
 /**
@@ -356,7 +356,7 @@ ShellUI.prototype.selectChar = function(index) {
 ShellUI.prototype.selectFromKeyboard = function(direction) {
 	length = this.inputElement.children.length;
 	if(length > 0) {
-		if(direction === 'left') {
+		if(direction === "left") {
 			if(this.keyboardSelected === null) {
 				this.selectChar(length-1);
 			} else if(this.keyboardSelected > 0) {
@@ -471,11 +471,11 @@ ShellUI.prototype.keyboardUp = function(e) {
  * @param {KeyboardEvent} e - The dispatched keyboard event.
  */
 ShellUI.prototype.keyboardInteraction = function(e) {
-	if((e.keyIdentifier && e.keyIdentifier === 'Meta') || (e.key && e.key === 'Meta')) {
+	if(e.keyIdentifier === "Meta" || e.key === "Meta") {
 		this.preventPaste = true;
 		return;
 	}
-	if(e.keyIdentifier == 'Control' || e.key === 'Control') {
+	if(e.keyIdentifier == "Control" || e.key === "Control") {
 		this.controlPressed = true;
 		return;
 	}
@@ -504,6 +504,10 @@ ShellUI.prototype.keyboardInteraction = function(e) {
        		break;
 	    default:
 	}
+};
+
+ShellUI.prototype.dragOver = function(e) {
+	e.preventDefault;
 };
 
 /**
@@ -535,11 +539,11 @@ ShellUI.prototype.dropText = function(e) {
  * @param {ClipboardEvent|string} e - The clipboard event or a string.
  */
 ShellUI.prototype.pasteText = function(e) {
-	var tx='';
-	if (typeof e === 'string') {
+	var tx = "";
+	if (typeof e === "string") {
 		tx = e;
 	} else {
-		tx = e.clipboardData.getData('text');
+		tx = e.clipboardData.getData("text");
 	}
 	var ptx = this.inputElement.textContent;
 	var ptp = '';
