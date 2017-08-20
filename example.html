@@ -7,13 +7,14 @@
   <link rel="stylesheet" type="text/css" href="ShellUI.css">
   <script src="build/compose.js"></script>
   <script>
-  	var shell = new ShellUI('input-element','shell-output-container');
+    var shellView = new ShellUIView('input-element','shell-output-container');
+  	var shellController = new ShellUI(shellView);
   	// Add normal command
-  	shell.addCommand('hello', function(name){
+  	shellController.addCommand('hello', function(name){
   		return 'You said hello to '+name;
   	});
   	// Add Async command
-  	shell.addCommand('asyncHello', function(name, duration){
+  	shellController.addCommand('asyncHello', function(name, duration){
   		if(duration === undefined){
   			duration = 3000;
   		}
