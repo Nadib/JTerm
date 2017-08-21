@@ -1,17 +1,16 @@
-var ShellUIModel = function(){
+var JTermModel = function(){
 	
-	ShuellUIEventDispatcher.call(this);
+	JTermEventDispatcher.call(this);
 	
-	/** @member {array} commandHistory - History of executed commands.*/
-	this.commandHistory = [];
+	/** @member {array} history - History of executed commands.*/
+	this.history = [];
 
 	/** @member {object} commands - List of available commands.*/
 	this.commands = {};
 	
 };
 
-// ShellUI extends ShellUIEventDispatcher
-ShellUIModel.prototype = Object.create(ShuellUIEventDispatcher.prototype);
+JTermModel.prototype = Object.create(JTermEventDispatcher.prototype);
 
 /**
  * Add a command executable by the shellUI.
@@ -22,31 +21,9 @@ ShellUIModel.prototype = Object.create(ShuellUIEventDispatcher.prototype);
  * 
  * @return {ShellUICommand} Command instance
  */
-ShellUIModel.prototype.addCommand = function(name, callback, options) {
-	this.commands[name] = new ShellUICommand(name, callback, options, this);
+JTermModel.prototype.addCommand = function(name, callback, options) {
+	this.commands[name] = new JTermCommand(name, callback, this, options);
 	return this.commands[name];
-};
-
-ShellUIModel.prototype.getCommandFromHistory = function(index) {
-	if(this.commandHistory[index]){
-		return this.commandHistory[index];
-	}
-	return null;
-	
-};
-
-
-/**
- * Get a command instance.
- * 
- * @param {string} name - Command name.
- * @return {ShellUICommand|null} The command instance or null if not exists.
- */
-ShellUIModel.prototype.getCommand = function(name){
-	if(this.commands[name]){
-		return this.commands[name];
-	}
-	return null;
 };
 
 /**
@@ -54,15 +31,38 @@ ShellUIModel.prototype.getCommand = function(name){
  * 
  * @param {string} The command as text.
  */
-ShellUIModel.prototype.executeCommand = function(command){
-	
-	this.commandHistory.push(command);
-	var parser = new ShellUICommandParser(command);
+JTermModel.prototype.execute = function(command) {
+	if(!command){
+		return;
+	}
+	this.history.push(command);
+	var parser = new JTermCommandParser(command);
 	var commandInstance = this.getCommand(parser.command);
-	if(commandInstance === null){
-		this.dispatchEvent(new ShellUIEvent('commandNotFound', {command : parser.command}));
-	}else{
-		this.dispatchEvent(new ShellUIEvent('commandStart'));		
+	if(commandInstance === null) {
+		this.dispatchEvent(new JTermEvent("commandNotFound", {command : parser.command}));
+	} else {
+		this.dispatchEvent(new JTermEvent("commandStart"));
 		commandInstance.execute(parser.getArguments());
 	}
+};
+
+/**
+ * Get a command instance.
+ * 
+ * @param {string} name - Command name.
+ * @return {ShellUICommand|null} The command instance or null if not exists.
+ */
+JTermModel.prototype.getCommand = function(name) {
+	if(this.commands[name]) {
+		return this.commands[name];
+	}
+	return null;
+};
+
+JTermModel.prototype.getCommandFromHistory = function(index) {
+	if(this.history[index]) {
+		return this.history[index];
+	}
+	return null;
+	
 };

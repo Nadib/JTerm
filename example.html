@@ -7,14 +7,15 @@
   <link rel="stylesheet" type="text/css" href="ShellUI.css">
   <script src="build/compose.js"></script>
   <script>
-    var shellView = new ShellUIView('input-element','shell-output-container');
-  	var shellController = new ShellUI(shellView);
+  	
+  	var terminal = JTerm.create("term", {input : "input-element", output : "shell-output-container"});
+    
   	// Add normal command
-  	shellController.addCommand('hello', function(name){
+  	terminal.addCommand('hello', function(name){
   		return 'You said hello to '+name;
   	});
   	// Add Async command
-  	shellController.addCommand('asyncHello', function(name, duration){
+  	terminal.addCommand('asyncHello', function(name, duration){
   		if(duration === undefined){
   			duration = 3000;
   		}

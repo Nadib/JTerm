@@ -1,24 +1,26 @@
-var ShellUIView = function(input, output, options){
+var JTermView = function(input, output, options){
 	
-	/** @member {Object} options - ShellUI options.*/
-	this.options = Object.assign( {
+	JTermOptions.call(this, options, {
 		highlightColor : "#a5a5a5",
 		prefix : "$"
-	}, options);
+	});
 	
 	this.elements = {shellInput:input, shellOutput:output};
 	
 };
 
+JTermView.prototype = Object.create(JTermOptions.prototype);
+
+
 /** @member {Number} Index of the current selected character.*/
-ShellUIView.prototype.selectedChar = null;
+JTermView.prototype.selectedChar = null;
 
 /**
  * Select a character from the shell input box.
  * 
  * @param {number} index - Index of the character to select in the shell input box.
  */
-ShellUIView.prototype.selectChar = function(index) {
+JTermView.prototype.selectChar = function(index) {
 	if(this.selectedChar !== null && this.getElement("shellInput").children[this.selectedChar]) {
 		this.getElement("shellInput").children[this.selectedChar].style["background-color"] = "transparent";
 	}
@@ -31,9 +33,9 @@ ShellUIView.prototype.selectChar = function(index) {
 	}
 };
 
-ShellUIView.prototype.insertChar = function(character) {
+JTermView.prototype.insertChar = function(character) {
 	
-	if(character.length > 1){
+	if(character.length > 1) {
 		var i;
 		var txl = character.length;
 		for(i=0;i<txl;i++) {
@@ -54,7 +56,7 @@ ShellUIView.prototype.insertChar = function(character) {
  * 
  * @param {number} index - Index of the character to remove from the input box.
  */
-ShellUIView.prototype.removeChar = function (){
+JTermView.prototype.removeChar = function () {
 	if(this.selectedChar !== null) {
 		if(this.selectedChar > 0) {
 			this.removeCharElement(this.selectedChar - 1);			
@@ -65,14 +67,14 @@ ShellUIView.prototype.removeChar = function (){
 	}
 };
 
-ShellUIView.prototype.removeCharElement = function(index){
-	if(this.getElement('shellInput').children[index]){  			
-		this.getElement('shellInput').removeChild(this.getElement('shellInput').children[index]);
+JTermView.prototype.removeCharElement = function(index) {
+	if(this.getElement("shellInput").children[index]) {  			
+		this.getElement("shellInput").removeChild(this.getElement("shellInput").children[index]);
 	}
-}
+};
 
 
-ShellUIView.prototype.getElement = function(name) {
+JTermView.prototype.getElement = function(name) {
 	if(this.elements[name]){
 		if (typeof this.elements[name] === "string") {
 			this.elements[name] = document.getElementById(this.elements[name]);
@@ -82,11 +84,11 @@ ShellUIView.prototype.getElement = function(name) {
 	return null;
 };
 
-ShellUIView.prototype.setElement = function(name, element) {
+JTermView.prototype.setElement = function(name, element) {
 	this.elements[name] = element;
 };
 
-ShellUIView.prototype.init = function() {
+JTermView.prototype.init = function() {
 	
 	// Input Element
 	if (typeof this.inputElement === "string") {
@@ -113,24 +115,23 @@ ShellUIView.prototype.init = function() {
  * 
  * @param {string} text - The text to print in the output container
  */
-ShellUIView.prototype.printToOutput = function(text){
+JTermView.prototype.printToOutput = function(text) {
 	this.getElement("shellOutput").appendChild(this.createElement("p", text));
 };
 
 /**
  * Empty the shell input.
  */
-ShellUIView.prototype.resetInput = function(){
+JTermView.prototype.resetInput = function() {
 	this.selectChar(null);
 	while (this.getElement('shellInput').firstChild) {
        	this.getElement('shellInput').removeChild(this.getElement('shellInput').firstChild);
    	}
 };
 
-ShellUIView.prototype.shellScrollToBottom = function(){
+JTermView.prototype.shellScrollToBottom = function() {
 	this.getElement("shellOutput").parentNode.scrollTop = this.getElement("shellOutput").parentNode.scrollHeight;
-
-}
+};
 
 /**
  * Helper function to create an element.
@@ -139,7 +140,7 @@ ShellUIView.prototype.shellScrollToBottom = function(){
  * @param {string} text - The text to insert in a text node.
  * @return {Element} The created dom element.
  */
-ShellUIView.prototype.createElement = function(type, text, styles){
+JTermView.prototype.createElement = function(type, text, styles){
 	var ne = document.createElement(type);
 	if(styles){
 		var k;

@@ -1,5 +1,5 @@
-# Javascript-Shell-UI
-A javascript shell UI like the Mac os X terminal
+# JTerm
+A javascript Terminal emulator
 
 Features list:
 
@@ -14,43 +14,3 @@ Features list:
 Example :
 
 Take a look at [example.html](https://github.com/Nadib/Javascript-Shell-UI/blob/master/example.html) for a basic integration example.
-
-Constructor arguments :
-
- * inputElement {string} Id of the HTML dom element used as input, generally a <span> element.
- * outputElement {string} Id of the HTML dom element used as container for the shell command output.
- * options {object} Options object (optional).
- 
-Available options :
-
- * prefix {string} Prefix for the shell input line, default '$'.
- * highlightColor {string} Highlight color, default value '#a5a5a5'.
- * helpEnabled {boolean} Define if the help command is enabled, default value 'true'.
- * language {string} Override the detected language, default value 'navigator.language'.
- * failbackLanguage {string} The failback language, default 'en'.
- 
- Supported events :
- 
- * 'commandComplete' Fired when a command is completed.
- * 'cancel' Fired when a command is cancelled.
-
-Simple javascript example :
-
-Type 'hello xxxxxx' or 'asyncHello xxxxxx' in the shell input to test.
-
-```javascript
-  	var shell = new ShellUI('input-element','shell-output-container');
-  	// Add normal command
-  	shell.addCommand('hello', function(name){
-  		return 'You said hello to '+name;
-  	});
-  	// Add Async command
-  	shell.addCommand('asyncHello', function(name, duration){
-  		if(duration === undefined){
-  			duration = 3000;
-  		}
-  		setTimeout(function(){
-  			this.endCommand('You said hello asynchronously to '+name+' during '+duration+'ms');		
-  		}.bind(this), duration);
-  	}, {async:true , summary:'Async hello command.', help:'Long Help text'});
-```

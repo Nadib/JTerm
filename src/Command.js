@@ -13,7 +13,7 @@
  * @license Apache-2.0
  * @author Nadib Bandi
  */
-var ShellUICommand = function(name, callback, options, shell) {
+var JTermCommand = function(name, callback, model, options) {
 	
 	if(!options) {
 		options = {};
@@ -23,14 +23,11 @@ var ShellUICommand = function(name, callback, options, shell) {
 	/** @member {function} Command callback function.*/
 	this.callback = callback;
 	/** @member {ShellUI} Shell instance.*/
-	this.shell = shell;
+	this.model = model;
 	/** @member {object} Command options.*/
 	this.options = options;
 	this.cancelBound = this.cancelCallback.bind(this);
 };
-
-/** @member {boolean} True when the command is cancelling.*/
-ShellUICommand.prototype.cancel = false;
 
 /**
  * Execute the command
@@ -39,10 +36,10 @@ ShellUICommand.prototype.cancel = false;
  * 
  * @return mixed
  */
-ShellUICommand.prototype.execute = function(args) {
+JTermCommand.prototype.execute = function(args) {
 	this.cancel = false;
-	this.shell.removeEventListener("cancel", this.cancelBound);
-	this.shell.addEventListener("cancel", this.cancelBound);
+	this.model.removeEventListener("cancel", this.cancelBound);
+	this.model.addEventListener("cancel", this.cancelBound);
 	if(this.options.async === true) {
 		this.callback.apply(this, args);
 	} else {
@@ -55,29 +52,29 @@ ShellUICommand.prototype.execute = function(args) {
  * 
  * @param {string} returnContent - content returned.
  */
-ShellUICommand.prototype.endCommand=function(content) {
-	if(this.cancel === false) {
-		var event = new ShellUIEvent("commandComplete", {returnContent:content, command:this});
-		this.shell.dispatchEvent(event);
+JTermCommand.prototype.endCommand=function(content) {
+	if(!this.cancel) {
+		var event = new JTermEvent("commandComplete", {returnContent:content, command:this});
+		this.model.dispatchEvent(event);
 	}
 };
 
 /**
  * Cancel cllback method.
  * 
- * @param {ShellUIEvent} e - ShellUI event cancel.
+ * @param {JTermEvent} e - ShellUI event cancel.
  */
-ShellUICommand.prototype.cancelCallback = function(e) {
+JTermCommand.prototype.cancelCallback = function(e) {
 	this.cancel = true;
-	var event = new ShellUIEvent("commandComplete", {returnContent:undefined, command:this});
-	this.shell.dispatchEvent(event);
+	var event = new JTermEvent("commandComplete", {returnContent:undefined, command:this});
+	this.model.dispatchEvent(event);
 };
 
 /**
  * Get the command signature.
  * @return {string}
  */
-ShellUICommand.prototype.getSignature = function() {
+JTermCommand.prototype.getSignature = function() {
 	if(!this.signature) {
 		this.signature = this.name;
 		var args=this.getArguments();
@@ -97,7 +94,7 @@ ShellUICommand.prototype.getSignature = function() {
  * 
  * @return {string} The help text.
  */
-ShellUICommand.prototype.getHelp = function(summary) {
+JTermCommand.prototype.getHelp = function(summary) {
 	var helpText = this.getSignature();
 	if(this.options.summary) {
 		helpText += " "+this.options.summary;
@@ -114,7 +111,7 @@ ShellUICommand.prototype.getHelp = function(summary) {
 /**
  * Get arguments list.
  */
-ShellUICommand.prototype.getArguments=function() {
+JTermCommand.prototype.getArguments=function() {
 	if(!this.arguments) {
 		this.arguments = [];
 		var args = this.callback.toString ().replace (/[\r\n\s]+/g, " ").match (/function\s*\w*\s*\((.*?)\)/)[1].split (/\s*,\s*/);
@@ -124,34 +121,5 @@ ShellUICommand.prototype.getArguments=function() {
         	this.arguments.push(args[i]);
         }
 	}
-	return this.arguments;
-};
-
-/**
- * Command parser
- * 
- * @param {string} command Command as string
- */
-var ShellUICommandParser = function(command) {
-	var cd = command.match(/'[^']*'|"[^"]*"|\S+/g) || [];
-	this.command = cd[0];
-	this.arguments=[];
-	var i=1;
-	var l = cd.length;
-	for(i=1;i<l;i++) {
-		if((cd[i][0] === '"' && cd[i][(cd[i].length-1)] === '"') || (cd[i][0] === "'" && cd[i][(cd[i].length-1)] === "'")) {
-			cd[i] = cd[i].substr(1);
-			cd[i] = cd[i].substr( 0, cd[i].length-1);
-		}
-		this.arguments.push(cd[i]);
-	}
-};
-
-
-/**
- * Get parsed arcguments.
- * @return {Array}
- */
-ShellUICommandParser.prototype.getArguments = function() {
 	return this.arguments;
 };
