@@ -1,13 +1,9 @@
 var JTermModel = function(controller){
 	
-	
-	
 	JTermEventDispatcher.call(this);
 	
 	/** @member {array} history - History of executed commands.*/
 	this.history = [];
-
-	this.controller = controller;
 
 	/** @member {object} commands - List of available commands.*/
 	this.commands = {};

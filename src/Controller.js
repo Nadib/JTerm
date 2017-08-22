@@ -27,7 +27,7 @@ var JTermController = function(view, options) {
 	});
 	
 	this.view = view;
-	this.model = new JTermModel(this);
+	this.model = new JTermModel();
 
 	this.model.addEventListener("commandNotFound", this.commandNotFound.bind(this));
 	this.model.addEventListener("commandStart", this.commandStart.bind(this));
@@ -144,11 +144,12 @@ JTermController.prototype.initCommands = function(){
  * @return {string} Help text.
  */
 JTermController.prototype.helpCommand = function(command) {
+	
 	var helpText = "";
 	if(!command) {		
 		helpText = this.getMessage("commandListTitle")+"\r\n\r\n";
 		for (var prop in this.model.commands) {
-			helpText += " - "+this.model.commands[prop].getHelp(true)+"\r\n";
+			helpText += " - "+this.getHelpDetails(this.getCommand(prop), true)+"\r\n";
 		}
 		helpText += "\r\n "+this.getMessage("commandHelp");
 	} else {
@@ -156,8 +157,22 @@ JTermController.prototype.helpCommand = function(command) {
 		if(ci === null){
 			helpText += this.getMessage("commandNotFound", null, [command]);
 		}else{
-			helpText += ci.getHelp();	
+			helpText += this.getHelpDetails(ci);	
 		}
+	}
+	return helpText;
+};
+
+JTermController.prototype.getHelpDetails = function(command, summary) {
+	var helpText = command.getSignature();
+	if(command.options.summary) {
+		helpText += " "+this.getMessage(command.options.summary);
+	}
+	if(summary === true) {
+		return helpText;
+	}
+	if(this.options.help) {
+		helpText += " \r\n"+this.getMessage(command.options.help);
 	}
 	return helpText;
 };

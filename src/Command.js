@@ -89,27 +89,6 @@ JTermCommand.prototype.getSignature = function() {
 };
 
 /**
- * Get Help
- * 
- * @param {boolean} summary - If true return only a short summary.
- * 
- * @return {string} The help text.
- */
-JTermCommand.prototype.getHelp = function(summary) {
-	var helpText = this.getSignature();
-	if(this.options.summary) {
-		helpText += " "+this.model.controller.getMessage(this.options.summary);
-	}
-	if(summary === true) {
-		return helpText;
-	}
-	if(this.options.help) {
-		helpText += " \r\n"+this.model.controller.getMessage(this.options.help);
-	}
-	return helpText;
-};
-
-/**
  * Get arguments list.
  */
 JTermCommand.prototype.getArguments=function() {
