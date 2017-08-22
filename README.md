@@ -13,4 +13,4 @@ Features list:
  
 Example :
 
-Take a look at [example.html](https://github.com/Nadib/Javascript-Shell-UI/blob/master/example.html) for a basic integration example.
+Take a look at [example.html](https://github.com/Nadib/JTerm/blob/master/example.html) for a basic integration example.

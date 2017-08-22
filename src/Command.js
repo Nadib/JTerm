@@ -9,6 +9,7 @@
  * List of available options :
  * 	async {boolean} true if the command is asynchronous.
  *  summary {string} short description.
+ *  args {array} List of arguments name. 
  * 
  * @license Apache-2.0
  * @author Nadib Bandi
@@ -97,13 +98,13 @@ JTermCommand.prototype.getSignature = function() {
 JTermCommand.prototype.getHelp = function(summary) {
 	var helpText = this.getSignature();
 	if(this.options.summary) {
-		helpText += " "+this.options.summary;
+		helpText += " "+this.model.controller.getMessage(this.options.summary);
 	}
 	if(summary === true) {
 		return helpText;
 	}
 	if(this.options.help) {
-		helpText += " \r\n"+this.options.help;
+		helpText += " \r\n"+this.model.controller.getMessage(this.options.help);
 	}
 	return helpText;
 };
@@ -118,8 +119,13 @@ JTermCommand.prototype.getArguments=function() {
         var i;
         var l = args.length;
         for(i=0;i<l;i++) {
-        	this.arguments.push(args[i]);
+        	if(args[i]){
+        		this.arguments.push(args[i]);
+        	}
         }
+	}
+	if(this.arguments.length === 0 && this.options.args){
+		this.arguments = this.options.args;
 	}
 	return this.arguments;
 };

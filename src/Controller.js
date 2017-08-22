@@ -8,6 +8,7 @@
  * 
  * Available options :
  *  - helpEnabled {boolean} Define if the help command is enabled, default value 'true'.
+ *  - setLangEnabled {boolean} Define if the setLang command is enabled, default value 'true'.
  *  - language {string} Override the detected language, default 'navigator.language'.
  *  - failbackLanguage {string} The failback language, default 'en'.
  *  - basePath {string} The base path, default 'src'.
@@ -20,12 +21,13 @@ var JTermController = function(view, options) {
 	
 	JTermOptions.call(this, options, {
 		helpEnabled : true,
+		setLangEnabled : true,
 		lang : navigator.language.split('-')[0],
 		failbackLang : "en"
 	});
 	
 	this.view = view;
-	this.model = new JTermModel();
+	this.model = new JTermModel(this);
 
 	this.model.addEventListener("commandNotFound", this.commandNotFound.bind(this));
 	this.model.addEventListener("commandStart", this.commandStart.bind(this));
@@ -37,10 +39,7 @@ var JTermController = function(view, options) {
 	}else{
 		document.addEventListener("DOMContentLoaded", this.init.bind(this));
 	}
-	// Enable help
-	if(this.options.helpEnabled === true){
-		this.addCommand("help", this.helpCommand.bind(this));
-	}
+	
 };
 JTermController.prototype = Object.create(JTermOptions.prototype);
 
@@ -95,28 +94,49 @@ JTermController.prototype.init = function() {
 	}
 	
 	JTerm.getLang(this.options.lang).load();
+	this.loadingLength = 1;
+	JTerm.getLang(this.options.lang).addEventListener('langLoaded', this.langLoaded.bind(this));
+	
 	if(this.options.lang !== this.options.failbackLang){
 		JTerm.getLang(this.options.failbackLang).load();
-		//this.loadDependancy(this.options.basePath+"/langs/"+this.options.failbackLang+".js");
+		this.loadingLength = 2;
+		JTerm.getLang(this.options.failbackLang).addEventListener('langLoaded', this.langLoaded.bind(this));
 	}
 	
-	/*this.loadDependancy(this.options.basePath+"/langs/"+this.options.lang+".js");
-	if(this.options.lang !== this.options.failbackLang){
-		this.loadDependancy(this.options.basePath+"/langs/"+this.options.failbackLang+".js");
-	}*/
 };
 
-/**
- * Load dependency file at execution.
- * 
- * @param {string} file - JS file to load.
- */
-JTermController.prototype.loadDependancy = function(file) {
-	var script = document.createElement("script");
-	script.src = file;
-	document.body.appendChild(script);
+JTermController.prototype.langLoaded = function(e){
+	this.loadingLength--;
+	if(this.loadingLength == 0){
+		this.initCommands();
+	}
 };
 
+JTermController.prototype.initCommands = function(){
+	// Enable help
+	if(this.getOption('helpEnabled')){
+		this.addCommand(
+			"help", 
+			this.helpCommand.bind(this),
+			{
+				args : ['command'],
+				summary: "helpSummary"
+			}
+		);
+	}
+	
+	if(this.getOption('setLangEnabled')){
+		this.addCommand(
+			"setLang", 
+			this.setLangCommand.bind(this), 
+			{
+				args : ["lang"],
+				summary: "setLangSummary"
+			}
+		);
+	}
+	
+};
 /**
  * Help command.
  * 
@@ -125,26 +145,39 @@ JTermController.prototype.loadDependancy = function(file) {
  */
 JTermController.prototype.helpCommand = function(command) {
 	var helpText = "";
-	if(command === undefined) {
-		
-		
-		
+	if(!command) {		
 		helpText = this.getMessage("commandListTitle")+"\r\n\r\n";
 		for (var prop in this.model.commands) {
-			if(prop !== "help"){					
-				helpText += " - "+this.model.commands[prop].getHelp(true)+"\r\n";
-			}
+			helpText += " - "+this.model.commands[prop].getHelp(true)+"\r\n";
 		}
 		helpText += "\r\n "+this.getMessage("commandHelp");
 	} else {
 		var ci = this.getCommand(command) ;
 		if(ci === null){
-			helpText +=this.getMessage("commandNotFound", null, [command])
+			helpText += this.getMessage("commandNotFound", null, [command]);
 		}else{
 			helpText += ci.getHelp();	
 		}
 	}
 	return helpText;
+};
+
+/**
+ * SetLang command.
+ * 
+ * @param {string} lang - lang code.
+ */
+JTermController.prototype.setLangCommand = function(lang) {
+	var langInstance = JTerm.getLang(lang);
+	if(!langInstance){
+		return this.getMessage("setLangNotSupported", null, [lang]);
+	}else{
+		this.options.lang = lang;
+		langInstance.addEventListener('langLoaded', function(e){
+			this.getCommand("setLang").endCommand(this.getMessage("setLangSuccess", null, [lang]));
+		}.bind(this));
+		langInstance.load();
+	}
 };
 
 /**
