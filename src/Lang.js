@@ -1,3 +1,14 @@
+/**
+ * JTerm lang constructor.
+ * @constructor
+ * @classdesc JTerm lang.
+ * @param {string} code - Lang code.
+ * @param {string} file - Lang file
+ * 
+ * @extends .JTermEventDispatcher
+ * @license Apache-2.0
+ * @author Nadib Bandi
+ */
 var JTermLang = function(code, file) {
 	JTermEventDispatcher.call(this);
 	this.code = code;
@@ -7,11 +18,18 @@ var JTermLang = function(code, file) {
 };
 JTermLang.prototype = Object.create(JTermEventDispatcher.prototype);
 
-
+/**
+ * Add a language file.
+ * 
+ * @param {string} file - Language file.
+ */
 JTermLang.prototype.addFile = function(file) {
 	this.files.push(file);
 };
 
+/**
+ * Load definition from language files.
+ */
 JTermLang.prototype.load = function() {
 	var script;
 	
@@ -26,6 +44,12 @@ JTermLang.prototype.load = function() {
 	}
 };
 
+/**
+ * File loaded callback.
+ * 
+ * @param {event} e
+ * @access private
+ */
 JTermLang.prototype.fileLoaded = function(e){
 	this.loading--;
 	if(this.loading === 0){
@@ -33,10 +57,21 @@ JTermLang.prototype.fileLoaded = function(e){
 	}
 };
 
+/**
+ * Define translations.
+ * 
+ * @param {object} definitions - Definitions to add.
+ */
 JTermLang.prototype.define = function(definitions) {
 	this.definitions = Object.assign(definitions, this.definitions);
 };
 
+/**
+ * Get definition.
+ * @param {string} definition
+ * @param {array} [args] - Arguments option to replace %s var in lnaguage.
+ * @returns {string} The definition.
+ */
 JTermLang.prototype.get = function(definition, args) {
 	var i=0;
 	if(this.definitions[definition]){

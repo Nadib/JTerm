@@ -1,6 +1,17 @@
+/**
+ * Event dispatcher constructor.
+ * 
+ * @classdesc Event dispatcher implementation.
+ * @constructor
+ * @license Apache-2.0
+ * @author Nadib Bandi
+ */
 var JTermEventDispatcher = function() {
 	
-	/** @member {object} eventListeners - Events listeners.*/
+	/** 
+	 * @property {object} listeners - Events listeners.
+	 * @access private
+	 */
 	this.listeners = {};
 };
 
@@ -8,7 +19,7 @@ var JTermEventDispatcher = function() {
  * Add an event listener.
  * 
  * @param {string} name - Event name.
- * @param {function} callback - Callback function to add as listener.
+ * @param {function} callback - Event callback function.
  */
 JTermEventDispatcher.prototype.addEventListener = function(name, callback) {
 	if(!this.listeners[name]) {
@@ -20,7 +31,7 @@ JTermEventDispatcher.prototype.addEventListener = function(name, callback) {
 /**
  * Fire an event.
  * 
- * @param {string} name - Event name.
+ * @param {JTermEvent} event - An event instance to dispatch.
  */
 JTermEventDispatcher.prototype.dispatchEvent = function(event) {
 	if(this.listeners[event.name]) {
@@ -38,6 +49,7 @@ JTermEventDispatcher.prototype.dispatchEvent = function(event) {
  * 
  * @param {string} name - Event name.
  * @param {function} callback - Callback function to remove from listeners.
+ * @returns {boolean} true if a listener was removed or false otherwise.
  */
 JTermEventDispatcher.prototype.removeEventListener = function(name, callback) {
 	if(this.listeners[name]) {
@@ -46,8 +58,9 @@ JTermEventDispatcher.prototype.removeEventListener = function(name, callback) {
 		for(i=0;i<l;i++) {
 			if(this.listeners[name][i] === callback) {
 				this.listeners[name].splice(i,1);
-				break;
+				return true;
 			}				
 		}
 	}
+	return false;
 };

@@ -1,0 +1,17 @@
+{
+	"opts": {
+        "template": "templates/default",
+        "encoding": "utf8",
+        "destination": "/Users/Busfront-Nomad/web/GitHub/JTerm/build/doc",
+        "recurse": true,
+         "include": ["/Users/Busfront-Nomad/web/GitHub/JTerm/src"],
+        "exclude": ["/Users/Busfront-Nomad/web/GitHub/JTerm/src/langs"]
+    },
+    "source": {
+        "include": ["/Users/Busfront-Nomad/web/GitHub/JTerm/src"],
+        "exclude": ["/Users/Busfront-Nomad/web/GitHub/JTerm/src/langs"],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": ["plugins/markdown"]
+}

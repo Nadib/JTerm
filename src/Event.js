@@ -1,16 +1,16 @@
 /**
- * Shell UI event object.
+ * JTerm event constructor.
  * @constructor
- * @classdesc Shell UI command.
+ * @classdesc JTerm event.
  * @param {string} name - Event name.
- * @param {object} options - Options object.
+ * @param {object} [options] - Options object.
  * 
  * @license Apache-2.0
  * @author Nadib Bandi
  */
 var JTermEvent = function(name, options) {
-	/** @member {string} name - Event name */
+	/** @property {string} name - Event name */
 	this.name = name;
-	/** @member {object} options - Event options */
+	/** @property {object} [options] - Event options */
 	this.options = options;
 };
